@@ -1,0 +1,150 @@
+
+
+.container_p{
+    max-width: 40rem;
+    border:  0.5px solid rgb(240, 232, 232);
+    width: 75vw;
+}
+.container_p .user{
+    
+    
+    width: 100%;
+    
+}
+
+.section_p {
+    
+    display: flex;
+    justify-content: center;
+    place-items: center;
+}
+
+.back_img{
+    width: 100%;
+    height: 10rem;
+    object-fit: cover;
+    z-index: -99;
+}
+
+.red_back{
+    background: rgb(126, 15, 15);
+}
+
+#profile_photo{
+    height: 150px;
+    width: 150px;
+    background-color: #000;
+    border-radius: 50%;
+    margin-left: 1rem;
+    margin-top: -75px;
+    object-fit: cover;
+}
+
+.f_level{
+    display: flex;
+    justify-content: space-between;
+}
+
+.edit_profile_btn{
+    margin-right: 1rem;
+    padding: 0.35rem 0.75rem;
+    height: 2rem;
+    background: #fff;
+    border-radius: 1rem;
+    transition: all 0.3s linear;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0);
+    min-width: 7rem;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+}
+
+.s_level{
+    margin-left: 1rem;
+    padding: 1rem 0;
+
+}
+
+.group_info{
+    display: flex
+}
+
+.group_item{
+    margin-right: 1rem;
+    text-transform: capitalize;
+    cursor:pointer;
+    border-bottom: 0.1rem solid #fff;
+}
+
+.group_item:hover{
+    border-bottom: 0.1rem solid #000;
+}
+
+.group_item span {
+    font-weight: 700;
+}
+
+.profile_username{
+    font-weight: 900;
+    padding: 0.5rem 0;
+    font-size: 1.25rem;
+}
+
+.profile_bio{
+    padding-bottom: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+.profile_button_container{
+    margin-top: 0.25rem;
+    align-items: center;   
+}
+
+
+.profile_mess{
+    background: #fff;
+    border-radius: 100%;
+    padding: 0.35rem 0.35rem;
+    margin-right: 0.5rem;
+    color: rgb(177, 34, 34);
+}
+.profile_mess i {
+    font-size: 1.25rem
+}
+
+.follow_btn{
+    background: linear-gradient(to right,rgb(101, 6, 6), rgb(181, 9, 9));
+    color: rgb(242, 255, 4);
+    border-color: rgb(101, 6, 6);
+}
+
+.profile_model{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0 , 0 , 0.6);
+    display: flex;
+    justify-content: center;
+    place-items: center;
+    flex-direction: column;    
+    z-index: 2;
+    transition: all 0.3s linear;
+}
+
+.profile_model .container {
+    width: 100vw;
+   
+    min-width: 30rem;
+    max-height: 22rem;
+    border-radius: 0.25rem;
+}   
+
+
+.profile_model .container form {
+   margin-top: 1.5rem;
+ }   
+
+ .hide {
+     display: none;
+ }

@@ -1,0 +1,25 @@
+.loading{
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    padding: 5rem;
+    font-size: 1.75rem;
+    color: rgb(174, 25, 25)
+    
+}
+
+.loading i {
+
+    animation-name: roating;
+    animation: roating 1.5s infinite linear;
+}
+
+@keyframes roating {
+    from {
+        transform: rotate(0);
+    }
+
+    to{
+        transform: rotate(360deg)
+    }
+}

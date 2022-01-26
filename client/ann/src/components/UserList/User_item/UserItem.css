@@ -1,0 +1,39 @@
+.inner_user{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.username{
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.comment{
+    font-size: 0.9rem;
+    padding-right: 1rem
+}
+
+.f_container{
+    display: flex;
+    align-items: center;
+   
+    transition: all 0.3s linear;
+    justify-content: flex-start
+}
+
+.img_post{
+    margin: 0.25rem 1rem;
+    
+}
+
+
+.payload_f{
+    width: 80%
+}
+
+.extra_user:hover{
+    background: rgba(0, 0, 0,0.1);
+    cursor: pointer;
+}
+

@@ -1,0 +1,179 @@
+.tool_li {
+    display: flex;
+    margin: 1rem auto;
+    color: rgb(118, 7, 7);
+    height: 2.5rem;
+    text-transform: capitalize;
+    font-size: 1.25rem;
+    transition: all 0.3s linear;
+    padding: 0.5rem 0.75rem;
+    border-top-right-radius: 0.25rem;
+    border-bottom-right-radius: 0.25rem;
+    
+}
+
+.tool_li:hover{
+    background:rgb(196, 73, 73);
+    color: #fff
+}
+
+ul{
+    list-style-type: none;
+}
+
+.tool_list{
+    width: 100%;
+    max-width: 10em;
+}
+
+.l_toolbar{
+    position: fixed;
+    display: grid;
+    align-items: start;
+    flex-direction: column;
+    width: calc((100vw - 41rem)/2);
+    justify-content: end;
+    align-content: center;
+    justify-items: end;
+    grid-template-columns: 10fr 0.5fr;
+    margin-left: 0.5rem;
+    z-index: 1;
+}
+
+.create-btn{
+    padding: 0.55rem 0.85rem;
+    text-transform: uppercase;
+    transition: all 0.3s linear;
+    border-radius: 1rem;
+    border: none;
+    transition: all 0.3s linear;
+    background: rgb(196, 73, 73);
+    color: rgb(235, 229, 229);
+    width: 95%
+}
+
+.create-btn:hover{
+    background: rgb(126, 15, 15);
+    color:#fff
+}
+
+.create-btn-container{
+    width: 100%;
+    padding-bottom: 1rem;
+}
+
+.li_span{
+    margin-right: 0.75rem;
+}
+
+.span_btn{
+    display: none;
+}
+
+.create_tweet_model{
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0 , 0 , 0.6);
+    display: flex;
+    justify-content: center;
+    place-items: center;
+    flex-direction: column;    
+
+}
+
+.deactive_something{
+    display: none;
+}
+
+.textarea_create{
+    resize: none;
+    height: 15rem;
+    width: 30rem;
+    padding: 1rem;
+    border-top-left-radius: 0.25rem;
+    border-top-right-radius: 0.25rem;
+    border: none;
+    outline: none;
+}
+.textarea_create:focus{
+    border: 1px solid #fff;
+}
+
+.model_content{
+    background: #fff;
+    border-radius: 0.25rem;
+}
+
+.model_btn_container{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 0.5rem 0.5rem 0.5rem;
+}
+
+.model_btn_container button{
+    padding: 0.35rem 0.75rem;
+    box-shadow: 0 5px 15px rgba(0, 0 , 0 , 0.2);
+    border: none;
+    border-radius: 0.25rem;
+    text-transform: uppercase;
+    transition: all 0.3s linear;
+    letter-spacing: 0.1rem;
+}
+
+.model_cancel{
+    background: rgb(198, 179, 70);
+}
+.model_cancel:hover{
+    background: rgb(191, 163, 8);
+    
+}
+
+.model_post{
+    background: rgb(196, 73, 73);
+}
+.model_post:hover{
+    background: rgb(172, 20, 20);
+}
+
+
+@media screen and (max-width: 950px) {
+    .l_toolbar{
+        width: calc(25vw/2);
+        justify-items: center;
+        margin-left: 0;
+    }
+    .l_content{
+        display: none;
+    }
+    .tool_list{
+        width: auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    .create-btn {
+        border-radius: 50%;
+
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+    .create-btn-container{
+        place-items: center;
+        text-align: center;
+        
+    }
+    .tool_li{
+        border-radius: 0.25rem;
+        
+    }
+    .li_span{
+        margin: 0;
+        font-size: 1.5rem;
+    }
+    .span_btn{
+        display: grid;
+    }
+
+}

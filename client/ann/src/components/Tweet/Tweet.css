@@ -1,0 +1,157 @@
+.img_post{
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+
+@font-face {
+    font-family: "BigBadRobot"; 
+    src: url('./BigBadRobot-7BvVK.ttf') format("truetype"); 
+    font-style: normal; 
+    font-weight: normal; 
+    } 
+
+.container_t{
+    background: #fff;
+    padding: 0.2rem 0rem;
+    display: flex;
+    justify-content: center;
+    max-width: 40rem;
+    width: 75vw;
+    border: 0.5px solid rgb(240, 232, 232);
+    transition: all 0.3s linear;
+  
+}
+
+.container_t:hover{
+    background: rgba(0, 0, 0,0.05);
+    cursor: pointer;
+}
+
+@media screen and (max-width: 700px){
+    .container_t{
+        width: 75vw
+    }
+}
+
+.payload{
+    max-width: 40rem;
+    width: 80%;
+    padding: 0 0 0.5rem 0;
+}
+
+.content_t{
+    margin-top: 0.2rem; 
+    padding-right: 0.5rem;  
+    white-space: pre-line;
+    word-wrap: break-word;
+    font-family: 'BigBadRobot';
+    color: rgb(174, 25, 25)
+
+}
+
+.foot_t {
+    border-top:  0.5px solid rgb(240, 232, 232);
+    
+    margin-top: 0.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+
+.btn{
+    padding: 0.2rem 0.4rem;
+    border: none;
+    text-transform: capitalize;
+    letter-spacing: 0.1rem;
+    background: #fff;
+    transition: all 0.3s linear;
+}
+
+.btn_delete{
+    color: rgb(118, 6, 6);
+    background: #fff;
+    
+}
+.btn_delete:hover{
+    color: rgb(90, 1, 1);
+    background: rgb(209, 145, 145);
+}
+
+
+
+.btn_update{
+    color: rgb(0, 13, 255);
+}
+.btn_update:hover{
+    background: rgb(135, 139, 224);
+    color: rgb(8, 13, 93);
+}
+
+
+
+.header_t{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  
+}
+
+.btn_container{
+    display: none;
+    margin-top: 1.25rem;
+    position: absolute;
+    width: 20rem;
+}
+
+.btn_container_active{
+    display: grid;
+}
+
+.btn_start{
+    height: 1.25rem;
+    background: transparent;    
+    transition: all 0.3s linear;
+    border: none;
+    width:  1.5rem
+}
+
+.btn_start:hover{
+    transform: rotate(-90deg);
+}
+
+.start_cont{
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+}
+
+.title_left{
+    display: flex;
+}
+
+.title_t{
+    margin-right: 0.5rem;
+}
+
+.foot_t i{
+    padding: 0.45rem 0.35rem 0.35rem 0.35rem;
+    border-radius: 100%;
+    transition: all 0.2s linear;
+    margin-right: 0.5rem;
+}
+
+.like{
+    color: rgb(214, 206, 206);
+}
+
+.like:hover{
+    background: rgb(224, 146, 146);
+}
+
+.pressed_like {
+    color:rgb(176, 13, 13)
+}
+
