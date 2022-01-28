@@ -1,68 +1,101 @@
-.create_tweet_model{
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0 , 0 , 0.6);
-    display: flex;
-    justify-content: center;
-    place-items: center;
-    flex-direction: column;    
-    z-index: 2;
+.create_tweet_model {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  place-items: center;
+  flex-direction: column;
+  z-index: 2;
 }
 
-.deactive_something{
-    
+.deactive_something {
 }
 
-.textarea_create{
-    resize: none;
-    height: 15rem;
-    width: 30rem;
-    padding: 1rem;
-    border-top-left-radius: 0.25rem;
-    border-top-right-radius: 0.25rem;
-    border: none;
-    outline: none;
+.textarea_create {
 }
-.textarea_create:focus{
-    border: 1px solid #fff;
+.textarea_create:focus {
+  border: 1px solid #fff;
 }
 
-.model_content{
-    background: #fff;
-    border-radius: 0.25rem;
+.model_content {
+  background: #fff;
+  border-radius: 0.25rem;
 }
 
-.model_btn_container{
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    padding: 0 0.5rem 0.5rem 0.5rem;
+.model_btn_container {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 0.5rem 0.5rem 0.5rem;
 }
 
-.model_btn_container button{
-    padding: 0.35rem 0.75rem;
-    box-shadow: 0 5px 15px rgba(0, 0 , 0 , 0.2);
-    border: none;
-    border-radius: 0.25rem;
-    text-transform: uppercase;
-    transition: all 0.3s linear;
-    letter-spacing: 0.1rem;
+.model_btn_container button {
+  padding: 0.35rem 0.75rem;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  border: none;
+  border-radius: 0.25rem;
+  text-transform: uppercase;
+  transition: all 0.3s linear;
+  letter-spacing: 0.1rem;
 }
 
-.model_cancel{
-    background: rgb(198, 179, 70);
+.model_cancel {
+  background: rgb(198, 179, 70);
 }
-.model_cancel:hover{
-    background: rgb(191, 163, 8);
-    
+.model_cancel:hover {
+  background: rgb(191, 163, 8);
 }
 
-.model_post{
-    background: rgb(196, 73, 73);
+.model_post {
+  background: rgb(196, 73, 73);
 }
-.model_post:hover{
-    background: rgb(172, 20, 20);
+.model_post:hover {
+  background: rgb(172, 20, 20);
+}
+
+.content_textarea {
+  resize: none;
+  width: 100%;
+  min-height: 7rem;
+  padding: 1rem;
+  padding-top: 0.5rem;
+  height: auto;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  background-color: rgb(235, 223, 223);
+}
+.model_container_t {
+  border: none;
+  border-radius: 0.25rem;
+}
+
+.model_comment_container {
+  width: 100%;
+  max-width: 40rem;
+  display: flex;
+  justify-content: center;
+}
+.comment_space {
+  width: 100%;
+  height: calc(100% - 75px);
+  min-height: 2.5rem;
+  display: grid;
+  justify-content: center;
+}
+
+.comment_stick {
+  background: rgba(93, 92, 92, 0.6);
+  width: 0.15rem;
+  height: 100%;
+  border-radius: 0.25rem;
+  margin-right: 0.35rem;
+}
+.add_stick {
+  display: grid;
+  justify-content: center;
 }
