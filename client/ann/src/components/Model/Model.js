@@ -222,7 +222,7 @@ const Model = ({ id, operation, start_content }) => {
                 <img
                   className="img_post"
                   src={
-                    author !== null &&
+                    localAuthor !== null &&
                     `http://localhost:4000/${localAuthor.avatar}`
                   }
                 />

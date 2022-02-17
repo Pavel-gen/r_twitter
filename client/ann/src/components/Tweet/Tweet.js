@@ -9,6 +9,7 @@ import postSlice, {
 } from "../../fearutures/postSlice";
 import { useSelector, useDispatch } from "react-redux";
 import moment from "moment";
+import Loading from "../Loading/Loading";
 
 import Model from "../Model/Model";
 
@@ -45,15 +46,29 @@ const removePost = async (id, dispatch, el) => {
 //    }
 //}
 
-const Tweet = ({ author, content, date, id, likes, likedBy, comments }) => {
+const Tweet = ({
+  author,
+  content,
+  date,
+  id,
+  likes,
+  likedBy,
+  comments,
+  type,
+  thread,
+}) => {
   const user_id = localStorage.getItem("user_id");
-
   const startLikeCondition = likedBy.includes(user_id);
 
   const [alt_content, setContent] = useState(content);
   const deleted_id = useSelector((state) => state.first_blood.id);
   const [altLikes, setAltLikes] = useState(likes);
   const [likeCondition, setLikeCondition] = useState(startLikeCondition);
+
+  const next_posts = thread.filter((el) => el.commentTo == id);
+  if (next_posts.length > 0) {
+    console.log(content, +":", next_posts);
+  }
 
   const Like = async () => {
     try {
@@ -78,20 +93,38 @@ const Tweet = ({ author, content, date, id, likes, likedBy, comments }) => {
       console.log(err);
     }
   };
-
   const dispatch = useDispatch();
+
   return (
     <>
-      <div id={id} className="container_t">
-        <img
-          className="img_post"
-          src={`http://localhost:4000/${author.avatar}`}
-        />
+      <div
+        id={id}
+        className={
+          type == "base"
+            ? thread.length == 0
+              ? "container_t"
+              : "container_t tweet_base"
+            : "container_t tweet_thread"
+        }
+      >
+        <div className={type == "comment" && "photo_thread"}>
+          <img
+            className="img_post"
+            src={`http://localhost:4000/${author.avatar}`}
+          />
+          {comments.length > 0 && (
+            <div className="comment_space">
+              <div className="comment_stick"></div>
+            </div>
+          )}
+        </div>
+
         <div className="payload">
           <div className="header_t">
             <div className="title_left">
               <h4 className="title_t">{author.username}</h4>
               <p>{moment(date).fromNow()}</p>
+              {type == "reply" && <p></p>}
             </div>
             <div className="start_cont">
               <button
@@ -183,6 +216,27 @@ const Tweet = ({ author, content, date, id, likes, likedBy, comments }) => {
           </div>
         </div>
       </div>
+      <>
+        {comments.length > 0 &&
+          next_posts.map((item) => {
+            return (
+              <>
+                <Tweet
+                  type="comment"
+                  key={item._id}
+                  author={item.author}
+                  content={item.content}
+                  date={item.createdAt}
+                  id={item._id}
+                  likes={item.likes}
+                  likedBy={item.likedBy}
+                  comments={item.comments}
+                  thread={thread.filter((el) => el !== item)}
+                />
+              </>
+            );
+          })}
+      </>
     </>
   );
 };

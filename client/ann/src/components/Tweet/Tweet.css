@@ -156,3 +156,15 @@
 .tweet_comment:hover {
   background-color: rgba(89, 128, 220, 0.75);
 }
+.tweet_thread {
+  border-bottom: none;
+  border-top: none;
+  padding-top: 0;
+}
+.tweet_base {
+  border-bottom: none;
+}
+
+.photo_thread {
+  margin-top: -0.25rem;
+}

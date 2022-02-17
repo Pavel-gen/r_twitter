@@ -103,7 +103,7 @@ class TweetController {
       const new_tweet_comment = await Tweet.create({
         author: user.id,
         content: req.body.content,
-        commentTo: target_tweet.author,
+        commentTo: target_tweet_id,
       });
 
       user.replies.push(new_tweet_comment.id);
