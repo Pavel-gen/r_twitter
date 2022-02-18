@@ -38,19 +38,26 @@ const ListTweet = ({ posts, user }) => {
 
   // короче сейчас придалим возсожность тивитам формировать треды
 
-  const current_thread = (id) => {
+  // эта функция собтрает твиты в треды
+  const current_thread = (id, author) => {
+    //    console.log(el._id);
+
     let our_arr = [];
-    let cur_posts = posts.filter((post) => post.commentTo == id);
+    let cur_posts = posts.filter(
+      (post) => post.commentTo == id && post.author._id == author
+    );
     our_arr = our_arr.concat(cur_posts);
     for (let i = 0; i < cur_posts.length; i++) {
-      let new_arr = current_thread(cur_posts[i]._id);
+      let new_arr = current_thread(cur_posts[i]._id, author);
       if (new_arr.length !== 0) {
         our_arr = our_arr.concat(new_arr);
       }
     }
     return our_arr;
   };
-  console.log(current_thread("620e3cee58552da1d809ff35"));
+  console.log(
+    current_thread("620e3cee58552da1d809ff35", "61d983c71c733a758ff89da2")
+  );
 
   return (
     <>
@@ -67,7 +74,7 @@ const ListTweet = ({ posts, user }) => {
                 likes={post.likes}
                 likedBy={post.likedBy}
                 comments={post.comments}
-                thread={current_thread(post._id)}
+                thread={current_thread(post._id, post.author._id)}
                 type="base"
               />
             );

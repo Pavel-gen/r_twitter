@@ -1,6 +1,6 @@
 .img_post {
-  width: 65px;
-  height: 65px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   object-fit: cover;
 }
@@ -19,7 +19,7 @@
   justify-content: center;
   max-width: 40rem;
   width: 75vw;
-  border: 0.5px solid rgb(240, 232, 232);
+  border: 0.75px solid rgb(240, 232, 232);
   transition: all 0.3s linear;
 }
 

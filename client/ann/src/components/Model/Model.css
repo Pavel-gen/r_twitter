@@ -82,7 +82,7 @@
 }
 .comment_space {
   width: 100%;
-  height: calc(100% - 75px);
+  height: calc(100% - 70px);
   min-height: 1.5rem;
   display: grid;
   justify-content: center;
@@ -91,10 +91,10 @@
 .comment_stick {
   background: rgba(93, 92, 92, 0.6);
   width: 0.15rem;
-  height: 100% + 0.65rem;
+  height: 100% + 0.75rem;
   border-radius: 0.25rem;
-  margin-right: 0.35rem;
-  margin-top: -0.35rem;
+  margin-right: 0.3rem;
+  margin-top: -0.45rem;
 }
 .add_stick {
   display: grid;

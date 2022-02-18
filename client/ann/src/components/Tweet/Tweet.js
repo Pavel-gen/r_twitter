@@ -46,6 +46,15 @@ const removePost = async (id, dispatch, el) => {
 //    }
 //}
 
+/*
+ сейчас реализована логика отображения твитов исходя их создателя треда
+ теперь нудно сделать так чтобы отображался только 1 тред
+
+можно прочто пикать первый попавшийся те тот который был создан первым и отобрадвть
+ну типо но по хорошему чтобы в ленте не было супер длинных тредов нудно будет их искусвенно укоротить добавив конпку отобразить
+
+*/
+
 const Tweet = ({
   author,
   content,
@@ -65,9 +74,18 @@ const Tweet = ({
   const [altLikes, setAltLikes] = useState(likes);
   const [likeCondition, setLikeCondition] = useState(startLikeCondition);
 
-  const next_posts = thread.filter((el) => el.commentTo == id);
+  let next_posts = thread.filter((el) => el.commentTo == id);
+  next_posts.sort((b, a) => {
+    return new Date(b.createdAt) - new Date(a.createdAt);
+  });
   if (next_posts.length > 0) {
-    console.log(content, +":", next_posts);
+    next_posts = [next_posts[0]];
+    //console.log(next_posts);
+  }
+
+  if (next_posts.length > 0) {
+    console.log(content + " : " + next_posts);
+    console.log(thread);
   }
 
   const Like = async () => {
@@ -101,18 +119,18 @@ const Tweet = ({
         id={id}
         className={
           type == "base"
-            ? thread.length == 0
+            ? next_posts.length == 0
               ? "container_t"
               : "container_t tweet_base"
             : "container_t tweet_thread"
         }
       >
-        <div className={type == "comment" && "photo_thread"}>
+        <div>
           <img
             className="img_post"
             src={`http://localhost:4000/${author.avatar}`}
           />
-          {comments.length > 0 && (
+          {next_posts.length > 0 && (
             <div className="comment_space">
               <div className="comment_stick"></div>
             </div>
@@ -217,7 +235,7 @@ const Tweet = ({
         </div>
       </div>
       <>
-        {comments.length > 0 &&
+        {next_posts.length > 0 &&
           next_posts.map((item) => {
             return (
               <>

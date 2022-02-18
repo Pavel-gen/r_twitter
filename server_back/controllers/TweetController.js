@@ -56,6 +56,12 @@ class TweetController {
   async delete(req, res) {
     try {
       const { id } = req.params;
+      const tweet = await Tweet.findById(id);
+      if (tweet.commentTo) {
+        const target_tweet = await Tweet.findById(tweet.commentTo);
+        target_tweet.comments.remove(id);
+        target_tweet.save();
+      }
       const deleted = await Tweet.findByIdAndDelete(id);
       res.status(200).json({ message: "deleted" });
     } catch (e) {
