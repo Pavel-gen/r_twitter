@@ -6,7 +6,7 @@ import { useSelector, useDispatch } from "react-redux";
 import Model from "../Model/Model";
 import EmptyList from "../EmptyList/EmptyList";
 
-const ListTweet = ({ posts, user }) => {
+const ListTweet = ({ posts, user, protocol }) => {
   console.log(posts);
 
   // нужно сохдать структуру которая будет раскладывать твиты по веткам и подгружать сооствествующий css
@@ -39,7 +39,16 @@ const ListTweet = ({ posts, user }) => {
 
 */
   let check_arr = posts.filter((post) => post.commentTo !== null);
-  let allowed_posts = posts.filter((post) => post.commentTo == null);
+  let allowed_posts;
+  if (protocol == "base") {
+    allowed_posts = posts.filter((post) => post.commentTo == null);
+  }
+  if (protocol == "likes") {
+    allowed_posts = posts;
+  }
+  if (protocol == "thread") {
+    allowed_posts = posts.filter((item) => item.threadId == null);
+  }
 
   // console.log(check_arr);
   // если сейчас делать локально то нудеа фнкция которая зашьёт в комменты потенциальный тред
@@ -76,29 +85,36 @@ const ListTweet = ({ posts, user }) => {
   const alt_current_thread = (id, author) => {
     let possible_posts = posts.filter((post) => post.commentTo == id);
   };
-
   return (
     <>
       <div className="list_tweets">
         {allowed_posts.length > 0 ? (
           allowed_posts.map((post) => {
             //            let thread = current_thread(post._id, post.author._id);
-            let thread = posts.filter((item) => item.threadId == post._id);
-            thread.sort((b, a) => {
-              return new Date(b.createdAt) - new Date(a.createdAt);
-            });
+            let thread;
+            if (protocol !== "thread") {
+              thread = posts.filter((item) => item.threadId == post._id);
+              thread.sort((b, a) => {
+                return new Date(b.createdAt) - new Date(a.createdAt);
+              });
+            } else {
+              thread = posts.filter((item) => item !== post);
+            }
+
             return (
               <Tweet
                 key={post._id}
-                author={user == "-" ? post.author : user}
+                author={post.author}
                 content={post.content}
                 date={post.createdAt}
                 id={post._id}
                 likes={post.likes}
                 likedBy={post.likedBy}
                 thread={thread}
-                type="base"
+                type={post.commentTo == null ? "base" : "comment"}
+                replyTo={post.commentTo}
                 origin_length={thread.length}
+                protocol={protocol}
               />
             );
           })

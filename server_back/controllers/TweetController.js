@@ -17,16 +17,20 @@ class TweetController {
   //this function should return current thread by id
   // so now we have base id and according to it we should get the full thread. right now i thinking how to implement it. hmmm good question dont ypu think
 
-  /* async getCurrentThread(req, res) {
+  async getCurrentThread(req, res) {
     try {
       const { id } = req.params;
-      const tweets = await Tweet.findById(id).populate("comments");
-      res.status(200).send(id);
+      const tweet = await Tweet.findById(id);
+      const thread = await Tweet.find({
+        $or: [{ threadId: tweet.threadId }, { _id: tweet.threadId }],
+      })
+        .sort("createdAt")
+        .populate("author");
+      res.status(200).json({ tweet, thread });
     } catch (err) {
       console.log(err);
     }
   }
-  */
 
   async deleteAll(req, res) {
     try {

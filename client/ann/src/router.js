@@ -60,7 +60,7 @@ export const AuthRoutes = [
     ),
   },
   {
-    path: "tweets/:id",
+    path: "tweets/thread/:id",
     element: (
       <>
         <ToolBar />

@@ -24,6 +24,7 @@ router.post(
   authMiddleware,
   TweetController.addComment
 );
+router.get("/posts/thread/:id", TweetController.getCurrentThread);
 
 router.post(
   "/users/registration",

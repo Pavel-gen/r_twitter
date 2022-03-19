@@ -67,6 +67,8 @@ const Tweet = ({
   thread,
   origin_length,
   base_id,
+  replyTo,
+  protocol,
 }) => {
   const user_id = localStorage.getItem("user_id");
   const startLikeCondition = likedBy.includes(user_id);
@@ -78,10 +80,9 @@ const Tweet = ({
 
   let next_post = thread[0];
   //  console.log(content);
-  console.log(thread);
   /* 
   if (type == "base") {
-    console.log(origin_length);
+    console.log(origin11_length);
   }
 */
   //  console.log("--------------------------");
@@ -120,26 +121,43 @@ const Tweet = ({
   if (type == "base") {
     base_id = id;
   }
-
+  console.log(replyTo);
   return (
     <>
-      {origin_length > 2 && thread.length > 1 && type == "comment" ? (
+      {origin_length > 2 &&
+      thread.length > 1 &&
+      protocol !== "thread" &&
+      type == "comment" ? (
         <></>
       ) : (
         <>
-          {origin_length > 2 && thread.length == 1 && (
+          {origin_length > 2 && thread.length == 1 && protocol !== "thread" && (
             <>
               <div className="show_button_container">
                 <button
                   className="show_btn"
                   onClick={() => {
-                    navigate(`/tweets/${base_id}`);
+                    navigate(`/tweets/thread/${id}`);
                   }}
                 >
                   show thread
                 </button>
               </div>
             </>
+          )}
+          {protocol == "thread" && replyTo == null && (
+            <div className="f_container f_comeback  ">
+              <button
+                className="back_btn"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate(-1);
+                }}
+              >
+                <i class="fa fa-arrow-circle-left" aria-hidden="true"></i>
+              </button>
+              <div className="username">Thread</div>
+            </div>
           )}
           <div
             id={id}
@@ -168,7 +186,12 @@ const Tweet = ({
                 <div className="title_left">
                   <h4 className="title_t">{author.username}</h4>
                   <p>{moment(date).fromNow()}</p>
-                  {type == "reply" && <p></p>}
+                  {type == "comment" && (
+                    <>
+                      <div className="reply_to">replyTo:</div>
+                      <div className="reply_to_author">{replyTo}</div>
+                    </>
+                  )}
                 </div>
                 <div className="start_cont">
                   <button
@@ -272,6 +295,7 @@ const Tweet = ({
         {next_post && (
           <>
             <Tweet
+              replyTo={next_post.author.username}
               type="comment"
               key={next_post._id}
               author={next_post.author}
@@ -284,6 +308,7 @@ const Tweet = ({
               thread={thread.filter((el) => el !== next_post)}
               origin_length={origin_length}
               base_id={base_id}
+              protocol={protocol}
             />
           </>
         )}

@@ -196,3 +196,12 @@
 }
 .show_btn_stick {
 }
+.reply_to {
+  margin-left: 0.5rem;
+  color: rgb(0, 13, 255);
+}
+
+.reply_to_author {
+  margin-left: 0.25rem;
+  color: rgb(118, 6, 6);
+}

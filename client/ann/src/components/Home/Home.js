@@ -87,7 +87,7 @@ const Home = () => {
     return (
       <div>
         <ToolBar />
-        <ListTweet posts={posts} user={"-"} />
+        <ListTweet posts={posts} user={"-"} protocol="base" />
       </div>
     );
   } else {
