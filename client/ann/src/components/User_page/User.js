@@ -89,16 +89,26 @@ const User = ({ type }) => {
     const index = new_url.indexOf("profile/") + 8;
     const new_id = new_url.slice(index, index + 24);
 
+    const url = `http://localhost:4000/api/users/${new_id}`;
+    const user = await fetch(url);
+    const current_user = await user.json();
+
     const user_id = localStorage.getItem("user_id");
     console.log(user_id);
     let data = await getPosts();
+    console.log(data);
 
-    if (data) {
+    if (data.length == 0) {
+      setUser(current_user);
+      setPosts([]);
+    }
+
+    if (data && data.length > 0) {
       data = data.filter((post) => post.author._id == new_id);
       data.map((post) => {
         console.log(post.author.username, " : ", post.content);
       });
-      setUser(data[0].author);
+      setUser(current_user);
       const tweets = data.sort((a, b) => {
         return new Date(b.createdAt) - new Date(a.createdAt);
       });

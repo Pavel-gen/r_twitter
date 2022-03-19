@@ -168,3 +168,31 @@
 .photo_thread {
   margin-top: -0.25rem;
 }
+.none {
+  display: none;
+}
+.show_button_container {
+  border: 0.75px solid rgb(240, 232, 232);
+  width: 100%;
+  height: 4rem;
+  border-top: none;
+  border-bottom: none;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+.show_btn {
+  border: 0.75px solid rgb(240, 232, 232);
+  background: rgb(20, 18, 18);
+  font-family: "BigBadRobot";
+  color: rgb(174, 25, 25);
+  font-size: 1.25rem;
+  padding: 0.35rem 0.75rem;
+  transition: all 0.3s linear;
+  border: none;
+}
+.show_btn:hover {
+  background: #fff;
+}
+.show_btn_stick {
+}

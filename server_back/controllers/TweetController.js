@@ -4,19 +4,39 @@ import User from "../models/User.js";
 class TweetController {
   async create(req, res) {
     try {
-      const user = await User.findById(req.user.id);
       const tweet = await Tweet.create({
-        author: user.id,
+        author: req.user.id,
         content: req.body.content,
       });
-      user.tweets.push(tweet);
-      user.save();
-      return res.status(200).json([tweet, user]);
+      return res.status(200).json(tweet);
     } catch (e) {
       console.log(e);
     }
   }
 
+  //this function should return current thread by id
+  // so now we have base id and according to it we should get the full thread. right now i thinking how to implement it. hmmm good question dont ypu think
+
+  /* async getCurrentThread(req, res) {
+    try {
+      const { id } = req.params;
+      const tweets = await Tweet.findById(id).populate("comments");
+      res.status(200).send(id);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+  */
+
+  async deleteAll(req, res) {
+    try {
+      const delete_twees = await Tweet.deleteMany();
+      //   const delete_users = await User.deleteMany();
+      res.status(228).json({ message: "all was deleted" });
+    } catch (err) {
+      console.log(err);
+    }
+  }
   async getAll(req, res) {
     try {
       const posts = await Tweet.find().populate("author");
@@ -56,12 +76,7 @@ class TweetController {
   async delete(req, res) {
     try {
       const { id } = req.params;
-      const tweet = await Tweet.findById(id);
-      if (tweet.commentTo) {
-        const target_tweet = await Tweet.findById(tweet.commentTo);
-        target_tweet.comments.remove(id);
-        target_tweet.save();
-      }
+
       const deleted = await Tweet.findByIdAndDelete(id);
       res.status(200).json({ message: "deleted" });
     } catch (e) {
@@ -104,20 +119,30 @@ class TweetController {
       const { target_tweet_id } = req.params;
 
       const target_tweet = await Tweet.findById(target_tweet_id);
-      const user = await User.findById(req.user.id);
+      console.log(target_tweet);
+      const comments = await Tweet.find({
+        commentTo: target_tweet_id,
+        author: target_tweet.author,
+      });
+      let threadId;
 
+      if (comments.length == 0 && target_tweet.author == req.user.id) {
+        if (!target_tweet.threadId) {
+          threadId = target_tweet_id;
+        } else {
+          threadId = target_tweet.threadId;
+        }
+      } else {
+        threadId = null;
+      }
       const new_tweet_comment = await Tweet.create({
-        author: user.id,
+        author: req.user.id,
         content: req.body.content,
         commentTo: target_tweet_id,
+        threadId,
       });
 
-      user.replies.push(new_tweet_comment.id);
-      user.save();
-
-      target_tweet.comments.push(new_tweet_comment.id);
-      target_tweet.save();
-      res.status(200).json({ target_tweet, user, new_tweet_comment });
+      res.status(200).json({ comments, new_tweet_comment });
     } catch (err) {
       console.log(err);
       res.status(400).json({ message: err.message });

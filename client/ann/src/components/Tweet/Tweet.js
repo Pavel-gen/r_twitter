@@ -15,6 +15,7 @@ import Model from "../Model/Model";
 
 import toggleModel from "../Model/toggleModel";
 import { choose_user } from "../../fearutures/userSlice";
+import { useNavigate } from "react-router-dom";
 
 const showMenu = (el) => {
   const parent = el.parentElement;
@@ -62,9 +63,10 @@ const Tweet = ({
   id,
   likes,
   likedBy,
-  comments,
   type,
   thread,
+  origin_length,
+  base_id,
 }) => {
   const user_id = localStorage.getItem("user_id");
   const startLikeCondition = likedBy.includes(user_id);
@@ -74,19 +76,20 @@ const Tweet = ({
   const [altLikes, setAltLikes] = useState(likes);
   const [likeCondition, setLikeCondition] = useState(startLikeCondition);
 
-  let next_posts = thread.filter((el) => el.commentTo == id);
-  next_posts.sort((b, a) => {
-    return new Date(b.createdAt) - new Date(a.createdAt);
-  });
-  if (next_posts.length > 0) {
-    next_posts = [next_posts[0]];
-    //console.log(next_posts);
+  let next_post = thread[0];
+  //  console.log(content);
+  console.log(thread);
+  /* 
+  if (type == "base") {
+    console.log(origin_length);
   }
+*/
+  //  console.log("--------------------------");
 
-  if (next_posts.length > 0) {
-    console.log(content + " : " + next_posts);
-    console.log(thread);
-  }
+  //if (next_posts.length > 0) {
+  //  console.log(content + " : " + next_posts);
+  //  console.log(thread);
+  //}
 
   const Like = async () => {
     try {
@@ -112,148 +115,178 @@ const Tweet = ({
     }
   };
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  if (type == "base") {
+    base_id = id;
+  }
 
   return (
     <>
-      <div
-        id={id}
-        className={
-          type == "base"
-            ? next_posts.length == 0
-              ? "container_t"
-              : "container_t tweet_base"
-            : "container_t tweet_thread"
-        }
-      >
-        <div>
-          <img
-            className="img_post"
-            src={`http://localhost:4000/${author.avatar}`}
-          />
-          {next_posts.length > 0 && (
-            <div className="comment_space">
-              <div className="comment_stick"></div>
-            </div>
+      {origin_length > 2 && thread.length > 1 && type == "comment" ? (
+        <></>
+      ) : (
+        <>
+          {origin_length > 2 && thread.length == 1 && (
+            <>
+              <div className="show_button_container">
+                <button
+                  className="show_btn"
+                  onClick={() => {
+                    navigate(`/tweets/${base_id}`);
+                  }}
+                >
+                  show thread
+                </button>
+              </div>
+            </>
           )}
-        </div>
-
-        <div className="payload">
-          <div className="header_t">
-            <div className="title_left">
-              <h4 className="title_t">{author.username}</h4>
-              <p>{moment(date).fromNow()}</p>
-              {type == "reply" && <p></p>}
+          <div
+            id={id}
+            className={
+              type == "base"
+                ? next_post == undefined
+                  ? "container_t"
+                  : "container_t tweet_base"
+                : "container_t tweet_thread"
+            }
+          >
+            <div>
+              <img
+                className="img_post"
+                src={`http://localhost:4000/${author.avatar}`}
+              />
+              {next_post && (
+                <div className="comment_space">
+                  <div className="comment_stick"></div>
+                </div>
+              )}
             </div>
-            <div className="start_cont">
-              <button
-                onClick={(e) => showMenu(e.currentTarget)}
-                className="btn_start "
-              >
-                <i className="fa fa-cog"></i>
-              </button>
-              <div className="btn_container">
-                {author._id == user_id ? (
-                  <>
-                    <button
-                      onClick={(e) =>
-                        removePost(id, dispatch, e.currentTarget.parentElement)
-                      }
-                      className="btn btn_delete"
-                    >
-                      delete
-                    </button>
-                    <button
-                      className="btn btn_update"
-                      onClick={(e) => {
-                        dispatch(changed_content(content));
-                        dispatch(choose_user(author));
-                        dispatch(changed_id(id));
-                        toggleModel("editmodel");
-                        showMenu(e.currentTarget.parentElement);
-                      }}
-                    >
-                      update
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button
-                      className="btn btn_delete"
-                      onClick={(e) =>
-                        window.location.assign(
-                          `http://localhost:3000/profile/${author._id}`
-                        )
-                      }
-                    >
-                      перейте к профилю
-                    </button>
-                    <button
-                      className="btn btn_delete"
-                      onClick={(e) => showMenu(e.currentTarget.parentElement)}
-                    >
-                      отмена
-                    </button>
-                  </>
-                )}
+
+            <div className="payload">
+              <div className="header_t">
+                <div className="title_left">
+                  <h4 className="title_t">{author.username}</h4>
+                  <p>{moment(date).fromNow()}</p>
+                  {type == "reply" && <p></p>}
+                </div>
+                <div className="start_cont">
+                  <button
+                    onClick={(e) => showMenu(e.currentTarget)}
+                    className="btn_start "
+                  >
+                    <i className="fa fa-cog"></i>
+                  </button>
+                  <div className="btn_container">
+                    {author._id == user_id ? (
+                      <>
+                        <button
+                          onClick={(e) =>
+                            removePost(
+                              id,
+                              dispatch,
+                              e.currentTarget.parentElement
+                            )
+                          }
+                          className="btn btn_delete"
+                        >
+                          delete
+                        </button>
+                        <button
+                          className="btn btn_update"
+                          onClick={(e) => {
+                            dispatch(changed_content(content));
+                            dispatch(choose_user(author));
+                            dispatch(changed_id(id));
+                            toggleModel("editmodel");
+                            showMenu(e.currentTarget.parentElement);
+                          }}
+                        >
+                          update
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          className="btn btn_delete"
+                          onClick={(e) =>
+                            window.location.assign(
+                              `http://localhost:3000/profile/${author._id}`
+                            )
+                          }
+                        >
+                          перейте к профилю
+                        </button>
+                        <button
+                          className="btn btn_delete"
+                          onClick={(e) =>
+                            showMenu(e.currentTarget.parentElement)
+                          }
+                        >
+                          отмена
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <p className="content_t">{content}</p>
+              <div className="foot_t">
+                <span>
+                  <i
+                    className={
+                      likeCondition
+                        ? "fa fa-heart like pressed_like"
+                        : "fa fa-heart like"
+                    }
+                    aria-hidden="true"
+                    onClick={(e) => {
+                      e.currentTarget.classList.toggle("pressed_like");
+                      Like();
+                    }}
+                  ></i>
+                  {altLikes !== 0 && altLikes}
+                </span>
+                <span>
+                  <i className="fa fa-retweet retweet" aria-hidden="true"></i>2
+                </span>
+                <span>
+                  <i
+                    className="fa fa-comment  tweet_comment"
+                    aria-hidden="true"
+                    onClick={(e) => {
+                      dispatch(changed_content(content));
+                      dispatch(choose_user(author));
+                      dispatch(changed_id(id));
+                      toggleModel("commentmodel");
+                    }}
+                  ></i>
+                  {thread.length}
+                </span>
               </div>
             </div>
           </div>
-          <p className="content_t">{content}</p>
-          <div className="foot_t">
-            <span>
-              <i
-                className={
-                  likeCondition
-                    ? "fa fa-heart like pressed_like"
-                    : "fa fa-heart like"
-                }
-                aria-hidden="true"
-                onClick={(e) => {
-                  e.currentTarget.classList.toggle("pressed_like");
-                  Like();
-                }}
-              ></i>
-              {altLikes !== 0 && altLikes}
-            </span>
-            <span>
-              <i className="fa fa-retweet retweet" aria-hidden="true"></i>2
-            </span>
-            <span>
-              <i
-                className="fa fa-comment  tweet_comment"
-                aria-hidden="true"
-                onClick={(e) => {
-                  dispatch(changed_content(content));
-                  dispatch(choose_user(author));
-                  dispatch(changed_id(id));
-                  toggleModel("commentmodel");
-                }}
-              ></i>
-              {comments.length}
-            </span>
-          </div>
-        </div>
-      </div>
+        </>
+      )}
       <>
-        {next_posts.length > 0 &&
-          next_posts.map((item) => {
-            return (
-              <>
-                <Tweet
-                  type="comment"
-                  key={item._id}
-                  author={item.author}
-                  content={item.content}
-                  date={item.createdAt}
-                  id={item._id}
-                  likes={item.likes}
-                  likedBy={item.likedBy}
-                  comments={item.comments}
-                  thread={thread.filter((el) => el !== item)}
-                />
-              </>
-            );
-          })}
+        {next_post && (
+          <>
+            <Tweet
+              type="comment"
+              key={next_post._id}
+              author={next_post.author}
+              content={next_post.content}
+              date={next_post.createdAt}
+              id={next_post._id}
+              likes={next_post.likes}
+              likedBy={next_post.likedBy}
+              comments={next_post.comments}
+              thread={thread.filter((el) => el !== next_post)}
+              origin_length={origin_length}
+              base_id={base_id}
+            />
+          </>
+        )}
       </>
     </>
   );

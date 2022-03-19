@@ -6,12 +6,13 @@ import { add_post, changed_content } from "../../fearutures/postSlice";
 import toggleModel from "../Model/toggleModel";
 import Model from "../Model/Model";
 import { choose_user } from "../../fearutures/userSlice";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const ToolBar = () => {
   const [content, setContent] = useState("");
 
   const dispatch = useDispatch();
-
+  const navigate = useNavigate();
   const id = localStorage.getItem("user_id");
 
   return (
@@ -21,9 +22,7 @@ const ToolBar = () => {
           <li
             className="tool_li"
             onClick={() => {
-              window.location.assign(
-                `http://localhost:3000/profile/${id}/home`
-              );
+              navigate(`/profile/${id}/home`);
             }}
           >
             <span>
@@ -34,7 +33,7 @@ const ToolBar = () => {
           <li
             className="tool_li"
             onClick={() => {
-              window.location.assign(`http://localhost:3000/profile/${id}`);
+              navigate(`/profile/${id}`);
             }}
           >
             <span>
@@ -51,7 +50,7 @@ const ToolBar = () => {
           <li
             onClick={() => {
               localStorage.clear();
-              document.location.href = `http://localhost:3000/registration`;
+              navigate(`/login`);
             }}
             className="tool_li"
           >

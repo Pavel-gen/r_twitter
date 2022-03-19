@@ -31,14 +31,23 @@ const ListTweet = ({ posts, user }) => {
 как это блять сделать сука -------
 
 */
+
+  /*
+  короче нуджо сделать так чтобы у треда динамически считалась длина треда и соотвественоо если > 3 твитов, то должны отображаться 
+  2 last ones и кнопка показать тред 
+  как-то это нужно имплеиентировать но как .... 
+
+*/
   let check_arr = posts.filter((post) => post.commentTo !== null);
   let allowed_posts = posts.filter((post) => post.commentTo == null);
+
   // console.log(check_arr);
   // если сейчас делать локально то нудеа фнкция которая зашьёт в комменты потенциальный тред
 
   // короче сейчас придалим возсожность тивитам формировать треды
 
   // эта функция собтрает твиты в треды
+  // разработать логику которая будет понимать длину нашего треда и отображать 1 твит + конпка посмоьреть конпки + 2 посдних твита
   const current_thread = (id, author) => {
     //    console.log(el._id);
 
@@ -46,6 +55,14 @@ const ListTweet = ({ posts, user }) => {
     let cur_posts = posts.filter(
       (post) => post.commentTo == id && post.author._id == author
     );
+    cur_posts.sort((b, a) => {
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
+    if (cur_posts.length > 0) {
+      cur_posts = [cur_posts[0]];
+      //console.log(next_posts);
+    }
+
     our_arr = our_arr.concat(cur_posts);
     for (let i = 0; i < cur_posts.length; i++) {
       let new_arr = current_thread(cur_posts[i]._id, author);
@@ -55,15 +72,21 @@ const ListTweet = ({ posts, user }) => {
     }
     return our_arr;
   };
-  console.log(
-    current_thread("620e3cee58552da1d809ff35", "61d983c71c733a758ff89da2")
-  );
+
+  const alt_current_thread = (id, author) => {
+    let possible_posts = posts.filter((post) => post.commentTo == id);
+  };
 
   return (
     <>
       <div className="list_tweets">
         {allowed_posts.length > 0 ? (
           allowed_posts.map((post) => {
+            //            let thread = current_thread(post._id, post.author._id);
+            let thread = posts.filter((item) => item.threadId == post._id);
+            thread.sort((b, a) => {
+              return new Date(b.createdAt) - new Date(a.createdAt);
+            });
             return (
               <Tweet
                 key={post._id}
@@ -73,9 +96,9 @@ const ListTweet = ({ posts, user }) => {
                 id={post._id}
                 likes={post.likes}
                 likedBy={post.likedBy}
-                comments={post.comments}
-                thread={current_thread(post._id, post.author._id)}
+                thread={thread}
                 type="base"
+                origin_length={thread.length}
               />
             );
           })

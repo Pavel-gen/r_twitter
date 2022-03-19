@@ -9,9 +9,9 @@ const Tweet = new Schema(
     title: { type: String },
     likes: { type: Schema.Types.Number, default: 0 },
     likedBy: [{ type: Schema.Types.ObjectId, ref: "User" }],
-    comments: [{ type: Schema.Types.ObjectId, ref: "Tweet" }],
+    //comments: [{ type: Schema.Types.ObjectId, ref: "Tweet" }],
     commentTo: { type: Schema.Types.ObjectId, ref: "Tweet", default: null },
-    //  threadId: { type: Schema.Types.OblectId, ref: "Tweet" },
+    threadId: { type: Schema.Types.ObjectId, ref: "Tweet", default: null },
   },
   {
     timestamps: true,

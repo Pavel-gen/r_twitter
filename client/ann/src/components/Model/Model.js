@@ -56,10 +56,8 @@ const Model = ({ id, operation, start_content }) => {
         body: JSON.stringify(data),
       });
       const result = await post.json();
-      let new_post = result[0];
-      new_post.author = result[1];
-      dispatch(add_post(new_post));
-      console.log(new_post);
+
+      dispatch(add_post(result));
       setContent("");
       toggleModel("postmodel");
     } catch (e) {
@@ -230,7 +228,7 @@ const Model = ({ id, operation, start_content }) => {
                   <div className="header_t">
                     <div className="title_left">
                       <h4 className="title_t">
-                        {author !== null && author.username}
+                        {author !== null && localAuthor.username}
                       </h4>
                     </div>
                     <div className="start_cont"></div>

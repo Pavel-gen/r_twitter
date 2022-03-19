@@ -15,6 +15,7 @@ router.post(
 );
 router.get("/posts", authMiddleware, TweetController.getAll);
 router.get("/posts/:id", TweetController.getOne);
+//router.get("/posts/thread/:id", TweetController.getCurrentThread);
 router.put("/posts/:id", TweetController.update);
 router.delete("/posts/:id", TweetController.delete);
 router.put("/posts/:tweet_id/likes", authMiddleware, TweetController.like);
@@ -38,5 +39,7 @@ router.get("/users/:id", UserController.getUser);
 router.get("/users/:id/followers", UserController.getFollowers);
 router.put("/users/:id", authMiddleware, UserController.follow);
 router.get("/users/:id/likes", UserController.getUserLikes);
+
+router.delete("/delete_all", TweetController.deleteAll);
 
 export default router;
