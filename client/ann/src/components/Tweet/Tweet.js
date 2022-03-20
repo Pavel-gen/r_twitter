@@ -69,6 +69,7 @@ const Tweet = ({
   base_id,
   replyTo,
   protocol,
+  comments,
 }) => {
   const user_id = localStorage.getItem("user_id");
   const startLikeCondition = likedBy.includes(user_id);
@@ -121,7 +122,7 @@ const Tweet = ({
   if (type == "base") {
     base_id = id;
   }
-  console.log(replyTo);
+
   return (
     <>
       {origin_length > 2 &&
@@ -145,7 +146,7 @@ const Tweet = ({
               </div>
             </>
           )}
-          {protocol == "thread" && replyTo == null && (
+          {protocol == "thread" && type == "base" && (
             <div className="f_container f_comeback  ">
               <button
                 className="back_btn"
@@ -186,7 +187,7 @@ const Tweet = ({
                 <div className="title_left">
                   <h4 className="title_t">{author.username}</h4>
                   <p>{moment(date).fromNow()}</p>
-                  {type == "comment" && (
+                  {replyTo && (
                     <>
                       <div className="reply_to">replyTo:</div>
                       <div className="reply_to_author">{replyTo}</div>
@@ -284,7 +285,7 @@ const Tweet = ({
                       toggleModel("commentmodel");
                     }}
                   ></i>
-                  {thread.length}
+                  {comments.length}
                 </span>
               </div>
             </div>

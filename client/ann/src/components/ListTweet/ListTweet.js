@@ -38,8 +38,10 @@ const ListTweet = ({ posts, user, protocol }) => {
   как-то это нужно имплеиентировать но как .... 
 
 */
-  let check_arr = posts.filter((post) => post.commentTo !== null);
   let allowed_posts;
+  const user_id = localStorage.getItem("user_id");
+  //   let check_arr = posts.filter((post) => post.commentTo !== null);
+
   if (protocol == "base") {
     allowed_posts = posts.filter((post) => post.commentTo == null);
   }
@@ -47,6 +49,9 @@ const ListTweet = ({ posts, user, protocol }) => {
     allowed_posts = posts;
   }
   if (protocol == "thread") {
+    allowed_posts = posts.filter((item) => item.threadId == null);
+  }
+  if (protocol == "profile_tweets") {
     allowed_posts = posts.filter((item) => item.threadId == null);
   }
 
@@ -111,10 +116,11 @@ const ListTweet = ({ posts, user, protocol }) => {
                 likes={post.likes}
                 likedBy={post.likedBy}
                 thread={thread}
-                type={post.commentTo == null ? "base" : "comment"}
+                type={post.threadId == null ? "base" : "comment"}
                 replyTo={post.commentTo}
                 origin_length={thread.length}
                 protocol={protocol}
+                comments={post.comments}
               />
             );
           })

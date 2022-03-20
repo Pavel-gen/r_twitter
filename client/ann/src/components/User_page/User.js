@@ -76,7 +76,7 @@ const User = ({ type }) => {
     if (type === "likes") {
       const likes = await getUserLikes();
       console.log(likes);
-      likes.map((like) => (like.commentTo = null));
+      //   likes.map((like) => (like.commentTo = null));
       if (likes) {
         setLikes(likes.reverse());
       }
@@ -124,6 +124,7 @@ const User = ({ type }) => {
   useEffect(() => {
     if (added_post) {
       const new_post = added_post.payload;
+      console.log(new_post);
       const lol = [new_post].concat(posts);
       setPosts(lol);
       console.log(lol);
@@ -150,7 +151,9 @@ const User = ({ type }) => {
     if (id_check !== null) {
       let id = id_check.payload;
       console.log(id);
-      setPosts(posts.filter((post) => post._id != id));
+      if (posts) {
+        setPosts(posts.filter((post) => post._id != id));
+      }
     }
   }, [id_check]);
 
@@ -174,7 +177,7 @@ const User = ({ type }) => {
           <TweetToolBar user={user} type={type} />
         </div>
         <ListTweet
-          protocol={type == "likes" ? "likes" : "base"}
+          protocol={type == "likes" ? "likes" : "profile_tweets"}
           posts={type == "likes" ? likes : posts}
           user={type == "likes" ? "-" : user}
         />

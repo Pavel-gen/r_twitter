@@ -78,7 +78,9 @@ const Home = () => {
     if (id_check !== null) {
       let id = id_check.payload;
       console.log(id);
-      setPosts(posts.filter((post) => post._id != id));
+      if (posts) {
+        setPosts(posts.filter((post) => post._id != id));
+      }
     }
   }, [id_check]);
 

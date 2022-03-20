@@ -56,7 +56,7 @@ const Model = ({ id, operation, start_content }) => {
         body: JSON.stringify(data),
       });
       const result = await post.json();
-
+      result.author = localAuthor;
       dispatch(add_post(result));
       setContent("");
       toggleModel("postmodel");
@@ -86,6 +86,7 @@ const Model = ({ id, operation, start_content }) => {
       const result = await request.json();
       toggleModel("editmodel");
       result.content = content;
+
       dispatch(update_post(result));
       console.log(data);
       console.log(result);
@@ -111,6 +112,10 @@ const Model = ({ id, operation, start_content }) => {
         },
         body: JSON.stringify(data),
       });
+      const result = await request.json();
+      console.log(result);
+      result.new_tweet_comment.author = localAuthor;
+      dispatch(add_post(result.new_tweet_comment));
       toggleModel("commentmodel");
       console.log(request);
     } catch (err) {
@@ -228,7 +233,7 @@ const Model = ({ id, operation, start_content }) => {
                   <div className="header_t">
                     <div className="title_left">
                       <h4 className="title_t">
-                        {author !== null && localAuthor.username}
+                        {localAuthor !== null && localAuthor.username}
                       </h4>
                     </div>
                     <div className="start_cont"></div>
@@ -255,7 +260,13 @@ const Model = ({ id, operation, start_content }) => {
                   >
                     cancel
                   </button>
-                  <button className="model_post" onClick={() => addComment()}>
+                  <button
+                    className="model_post"
+                    onClick={() => {
+                      addComment();
+                      setCommContent("");
+                    }}
+                  >
                     reply
                   </button>
                 </>

@@ -80,9 +80,19 @@ class TweetController {
   async delete(req, res) {
     try {
       const { id } = req.params;
+      const tweet = await Tweet.findById(id);
+      if (tweet.commentTo) {
+        let target_tweet = await Tweet.findById(tweet.commentTo);
+        target_tweet.comments = target_tweet.comments.filter((item) => {
+          item !== tweet._id;
+          console.log(item, tweet._id);
+        });
 
+        target_tweet.save();
+      }
       const deleted = await Tweet.findByIdAndDelete(id);
-      res.status(200).json({ message: "deleted" });
+
+      res.status(200).json({ message: "deleted" }, target_tweet);
     } catch (e) {
       res.json(e);
     }
@@ -145,8 +155,11 @@ class TweetController {
         commentTo: target_tweet_id,
         threadId,
       });
+      target_tweet.comments.push(new_tweet_comment._id);
 
-      res.status(200).json({ comments, new_tweet_comment });
+      target_tweet.save();
+
+      res.status(200).json({ new_tweet_comment });
     } catch (err) {
       console.log(err);
       res.status(400).json({ message: err.message });
