@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import ListTweet from "../ListTweet/ListTweet";
 import Loading from "../Loading/Loading";
 
-const TweetPage = () => {
+const ThreadPage = () => {
   let { id } = useParams();
   const [posts, setPosts] = useState([]);
   console.log(id);
@@ -29,4 +29,4 @@ const TweetPage = () => {
   }
 };
 
-export default TweetPage;
+export default ThreadPage;

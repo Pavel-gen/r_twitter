@@ -53,7 +53,7 @@ class TweetController {
   async getOne(req, res) {
     try {
       const { id } = req.params;
-      const post = await Tweet.findById(id);
+      const post = await Tweet.findById(id).populate("author");
       res.status(200).send(post);
     } catch (e) {
       console.log(e);
@@ -160,6 +160,20 @@ class TweetController {
       target_tweet.save();
 
       res.status(200).json({ new_tweet_comment });
+    } catch (err) {
+      console.log(err);
+      res.status(400).json({ message: err.message });
+    }
+  }
+  async getComments(req, res) {
+    try {
+      const tweet_id = req.params.id;
+
+      const comments = await Tweet.find({
+        commentTo: tweet_id,
+      }).populate("author");
+
+      res.status(200).json(comments);
     } catch (err) {
       console.log(err);
       res.status(400).json({ message: err.message });

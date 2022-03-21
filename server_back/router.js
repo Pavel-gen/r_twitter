@@ -16,6 +16,7 @@ router.post(
 router.get("/posts", authMiddleware, TweetController.getAll);
 router.get("/posts/:id", TweetController.getOne);
 //router.get("/posts/thread/:id", TweetController.getCurrentThread);
+router.get("/posts/coms/:id", TweetController.getComments);
 router.put("/posts/:id", TweetController.update);
 router.delete("/posts/:id", TweetController.delete);
 router.put("/posts/:tweet_id/likes", authMiddleware, TweetController.like);

@@ -1,15 +1,18 @@
-import React from 'react' 
+import React, { useState } from "react";
 
-import './EmptyList.css'
+import "./EmptyList.css";
 
+const EmptyList = ({ protocol }) => {
+  const [message, setMessage] = useState("Empty list");
+  if (protocol == "choosen_post" && message == "Empty list") {
+    setMessage("No comments");
+  }
 
+  return (
+    <>
+      <div className="empty_message">{message}</div>
+    </>
+  );
+};
 
-const EmptyList = () => {
-    return (<>
-        <div className='empty_message'>
-                    Список пуст
-                </div>
-    </>)
-}
-
-export default EmptyList
+export default EmptyList;

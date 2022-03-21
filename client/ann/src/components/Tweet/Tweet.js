@@ -6,6 +6,7 @@ import postSlice, {
   update_post,
   changed_content,
   changed_id,
+  choose_post,
 } from "../../fearutures/postSlice";
 import { useSelector, useDispatch } from "react-redux";
 import moment from "moment";
@@ -78,8 +79,10 @@ const Tweet = ({
   const deleted_id = useSelector((state) => state.first_blood.id);
   const [altLikes, setAltLikes] = useState(likes);
   const [likeCondition, setLikeCondition] = useState(startLikeCondition);
-
-  let next_post = thread[0];
+  let next_post;
+  if (thread) {
+    next_post = thread[0];
+  }
   //  console.log(content);
   /* 
   if (type == "base") {
@@ -254,7 +257,31 @@ const Tweet = ({
                   </div>
                 </div>
               </div>
-              <p className="content_t">{content}</p>
+              <div
+                className="content_t"
+                onClick={() => {
+                  dispatch(
+                    choose_post({
+                      author,
+                      content,
+                      date,
+                      id,
+                      likes,
+                      likedBy,
+                      type,
+                      thread: [],
+                      origin_length,
+                      base_id,
+                      commentTo: replyTo,
+                      protocol,
+                      comments,
+                    })
+                  );
+                  navigate(`/tweets/${id}`);
+                }}
+              >
+                {content}
+              </div>
               <div className="foot_t">
                 <span>
                   <i

@@ -4,7 +4,8 @@ import Home from "./components/Home/Home.js";
 import User from "./components/User_page/User.js";
 import UserList from "./components/UserList/UserList.js";
 import ToolBar from "./components/ToolBar/ToolBar.js";
-import TweetPage from "./components/TweetPage/TweetPage.js";
+import ThreadPage from "./components/ThreadPage/ThreadPage.js";
+import PersonalTweetPage from "./components/PersonalTweetPage/PersonalTweetPage.js";
 
 export const notAuthRoutes = [
   {
@@ -64,7 +65,16 @@ export const AuthRoutes = [
     element: (
       <>
         <ToolBar />
-        <TweetPage />
+        <ThreadPage />
+      </>
+    ),
+  },
+  {
+    path: "tweets/:id",
+    element: (
+      <>
+        <ToolBar />
+        <PersonalTweetPage />
       </>
     ),
   },

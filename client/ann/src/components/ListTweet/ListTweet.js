@@ -7,8 +7,6 @@ import Model from "../Model/Model";
 import EmptyList from "../EmptyList/EmptyList";
 
 const ListTweet = ({ posts, user, protocol }) => {
-  console.log(posts);
-
   // нужно сохдать структуру которая будет раскладывать твиты по веткам и подгружать сооствествующий css
 
   /*
@@ -53,6 +51,10 @@ const ListTweet = ({ posts, user, protocol }) => {
   }
   if (protocol == "profile_tweets") {
     allowed_posts = posts.filter((item) => item.threadId == null);
+  }
+
+  if (protocol == "choosen_post") {
+    allowed_posts = posts;
   }
 
   // console.log(check_arr);
@@ -125,7 +127,7 @@ const ListTweet = ({ posts, user, protocol }) => {
             );
           })
         ) : (
-          <EmptyList />
+          <EmptyList protocol={protocol} />
         )}
 
         <Model id="editmodel" operation="EDIT" />

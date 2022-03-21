@@ -45,8 +45,9 @@
   padding-right: 0.5rem;
   white-space: pre-line;
   word-wrap: break-word;
-  font-family: "BigBadRobot";
-  color: rgb(174, 25, 25);
+  /*  font-family: "BigBadRobot";*/
+  font-size: 1.07rem;
+  color: rgb(0, 0, 0);
 }
 
 .foot_t {
