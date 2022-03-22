@@ -14,7 +14,7 @@ const getPrevT = async (dispatch, id) => {
   dispatch(choose_post(result));
 };
 
-const BackButton = ({ content, post_id }) => {
+const BackButton = ({ content, post_id, type }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   console.log(post_id);
@@ -26,7 +26,9 @@ const BackButton = ({ content, post_id }) => {
           className="back_btn"
           onClick={(e) => {
             e.preventDefault();
-            getPrevT(dispatch, post_id);
+            if (type == "tweet") {
+              getPrevT(dispatch, post_id);
+            }
             navigate(-1);
           }}
         >

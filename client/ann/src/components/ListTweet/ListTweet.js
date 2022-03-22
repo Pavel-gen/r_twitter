@@ -123,6 +123,7 @@ const ListTweet = ({ posts, user, protocol }) => {
                 origin_length={thread.length}
                 protocol={protocol}
                 comments={post.comments}
+                subtype={null}
               />
             );
           })

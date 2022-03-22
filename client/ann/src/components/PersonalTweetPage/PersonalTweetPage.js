@@ -1,13 +1,14 @@
 import { current } from "@reduxjs/toolkit";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { choose_post } from "../../fearutures/postSlice";
 import BackButton from "../BackButton/BackButton";
 import ListTweet from "../ListTweet/ListTweet";
 import Loading from "../Loading/Loading";
 import Tweet from "../Tweet/Tweet";
 import "../Tweet/Tweet.css";
+import moment from "moment";
 
 const goBack = async (dispatch, id) => {
   console.log("i an jje");
@@ -25,7 +26,6 @@ const PersonalTweetPage = () => {
   const [loading, setLoading] = useState(true);
   const { id } = useParams();
   const choosen_post = useSelector((state) => state.first_blood.this_post);
-  const dispatch = useDispatch();
 
   useEffect(async () => {
     setLoading(true);
@@ -68,22 +68,33 @@ const PersonalTweetPage = () => {
     return (
       <>
         <div className="list_tweets">
-          <BackButton content={"Tweet"} post_id={currentPost.replyTo} />
+          <BackButton
+            content={"Tweet"}
+            post_id={currentPost.replyTo}
+            type="tweet"
+          />
           <div className="container_t">
-            <Tweet {...currentPost} type="choosen_post" />
+            <Tweet {...currentPost} subtype="choosen_post" />
           </div>
           <Loading />
         </div>
       </>
     );
   }
+
   return (
     <>
       <div className="list_tweets">
-        <BackButton content={"Tweet"} post_id={currentPost.commentTo} />
-        <div className="container_t">
-          <Tweet {...currentPost} type="choosen_post" />
-        </div>
+        <BackButton
+          content={"Tweet"}
+          post_id={currentPost.commentTo}
+          type="tweet"
+        />
+        <Tweet {...currentPost} subtype="choosen_post" />
+
+        {/*<div className="container_t">
+          <Tweet {...currentPost} type="choosen_post" /> 
+        </div>*/}
         <ListTweet posts={comments} protocol="choosen_post" />
       </div>
     </>
