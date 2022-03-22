@@ -1,4 +1,7 @@
-.list_tweets{
-    display: grid;
-    justify-content: center;
+.list_tweets {
+  display: grid;
+  justify-content: center;
+}
+.com_p {
+  font-size: 1.25rem;
 }
