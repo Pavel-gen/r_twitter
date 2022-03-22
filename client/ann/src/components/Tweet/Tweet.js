@@ -83,8 +83,6 @@ const Tweet = ({
   let next_post;
   if (thread) {
     next_post = thread[0];
-    console.log(next_post);
-    console.log(thread);
   }
 
   //  console.log(thread);
@@ -158,7 +156,7 @@ const Tweet = ({
               </div>
             </>
           )}
-          
+
           {subtype == "choosen_post" && (
             <>
               <div
@@ -176,18 +174,35 @@ const Tweet = ({
                     <img
                       className="img_post img_post_ch"
                       src={`http://localhost:4000/${author.avatar}`}
+                      onClick={() => {
+                        navigate(`/profile/${author._id}`, {
+                          replace: true,
+                        });
+                      }}
                     />
 
                     <div className="header_t">
                       <div className="title_left header_choosed">
-                        <h4 className="title_t title_choosed">
+                        <h4
+                          className="title_t title_choosed"
+                          onClick={() => {
+                            navigate(`/profile/${author._id}`);
+                          }}
+                        >
                           {author.username}
                         </h4>
                         <p className="choosed_p"> {moment(date).fromNow()}</p>
                         {replyTo && (
                           <>
                             <div className="reply_to">replyTo:</div>
-                            <div className="reply_to_author">{replyTo}</div>
+                            <div
+                              className="reply_to_author"
+                              onClick={() => {
+                                navigate(`/tweets/${replyTo}`);
+                              }}
+                            >
+                              {replyTo}
+                            </div>
                           </>
                         )}
                       </div>
@@ -333,6 +348,11 @@ const Tweet = ({
                 <img
                   className="img_post"
                   src={`http://localhost:4000/${author.avatar}`}
+                  onClick={() => {
+                    navigate(`/profile/${author._id}`, {
+                      replace: true,
+                    });
+                  }}
                 />
                 {next_post && (
                   <div className="comment_space">
@@ -344,12 +364,26 @@ const Tweet = ({
               <div className="payload">
                 <div className="header_t">
                   <div className="title_left">
-                    <h4 className="title_t">{author.username}</h4>
+                    <h4
+                      className="title_t"
+                      onClick={() => {
+                        navigate(`/profile/${author._id}`, { replace: true });
+                      }}
+                    >
+                      {author.username}
+                    </h4>
                     <p>{moment(date).fromNow()}</p>
                     {replyTo && (
                       <>
                         <div className="reply_to">replyTo:</div>
-                        <div className="reply_to_author">{replyTo}</div>
+                        <div
+                          className="reply_to_author"
+                          onClick={() => {
+                            navigate(`/tweets/${replyTo}`);
+                          }}
+                        >
+                          {replyTo}
+                        </div>
                       </>
                     )}
                   </div>
@@ -393,9 +427,9 @@ const Tweet = ({
                           <button
                             className="btn btn_delete"
                             onClick={(e) =>
-                              window.location.assign(
-                                `http://localhost:3000/profile/${author._id}`
-                              )
+                              navigate(`/profile/${author._id}`, {
+                                replace: true,
+                              })
                             }
                           >
                             перейте к профилю
@@ -481,7 +515,7 @@ const Tweet = ({
         {next_post && (
           <>
             <Tweet
-              replyTo={next_post.author.username}
+              replyTo={next_post.commentTo}
               type="comment"
               key={next_post._id}
               author={next_post.author}

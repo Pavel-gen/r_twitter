@@ -41,17 +41,27 @@ const PersonalTweetPage = () => {
   }, [document.location.href]);
 
   useEffect(async () => {
+    console.log(choosen_post);
     if (choosen_post) {
-      setCurrentPost(choosen_post.payload);
-      localStorage.setItem(
-        "current_post",
-        JSON.stringify(choosen_post.payload)
-      );
+      if (choosen_post.payload.id == id) {
+        setCurrentPost(choosen_post.payload);
+        localStorage.setItem(
+          "current_post",
+          JSON.stringify(choosen_post.payload)
+        );
+      } else {
+        console.log(id);
+        const url = `http://localhost:4000/api/posts/${id}`;
+        const prev_post = await fetch(url);
+        const result = await prev_post.json();
+        setCurrentPost(result);
+        localStorage.setItem("current_post", JSON.stringify(result));
+      }
     } else {
       let post = localStorage.getItem("current_post");
       setCurrentPost(JSON.parse(post));
     }
-  }, [choosen_post]);
+  }, [choosen_post, document.location.href]);
 
   // console.log({ ...currentPost });
 
@@ -90,12 +100,20 @@ const PersonalTweetPage = () => {
           post_id={currentPost.commentTo}
           type="tweet"
         />
-        <Tweet {...currentPost} subtype="choosen_post" />
+        <Tweet
+          {...currentPost}
+          subtype="choosen_post"
+          replyTo={currentPost.commentTo}
+        />
 
         {/*<div className="container_t">
           <Tweet {...currentPost} type="choosen_post" /> 
         </div>*/}
-        <ListTweet posts={comments} protocol="choosen_post" />
+        <ListTweet
+          posts={comments}
+          protocol="choosen_post"
+          replyTo={currentPost.commentTo}
+        />
       </div>
     </>
   );
