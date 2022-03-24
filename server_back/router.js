@@ -15,6 +15,9 @@ router.post(
 );
 router.get("/posts", authMiddleware, TweetController.getAll);
 router.get("/posts/:id", TweetController.getOne);
+
+router.get("/tweets/spec", authMiddleware, TweetController.getUserPosts);
+
 //router.get("/posts/thread/:id", TweetController.getCurrentThread);
 router.get("/posts/coms/:id", TweetController.getComments);
 router.put("/posts/:id", TweetController.update);
@@ -25,6 +28,7 @@ router.post(
   authMiddleware,
   TweetController.addComment
 );
+router.put("/posts/retweet/:id", authMiddleware, TweetController.addRetweet);
 router.get("/posts/thread/:id", TweetController.getCurrentThread);
 
 router.post(

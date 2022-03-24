@@ -12,7 +12,9 @@ const Tweet = new Schema(
     comments: [{ type: Schema.Types.ObjectId, ref: "Tweet", default: [] }],
     commentTo: { type: Schema.Types.ObjectId, ref: "Tweet", default: null },
     threadId: { type: Schema.Types.ObjectId, ref: "Tweet", default: null },
+    retweetedBy: [{ type: Schema.Types.ObjectId, ref: "User" }],
   },
+
   {
     timestamps: true,
   }

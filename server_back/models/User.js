@@ -14,6 +14,8 @@ const User = new Schema({
   backimg: { type: String },
   bio: { type: String },
   liked: [{ type: Schema.Types.ObjectId, ref: "Tweet" }],
+  retweets: [{ type: Schema.Types.ObjectId, ref: "Tweet" }],
+
   //  replies: [{ type: Schema.Types.ObjectId, ref: "Tweet" }],
 });
 

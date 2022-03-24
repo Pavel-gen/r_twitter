@@ -32,10 +32,32 @@ class TweetController {
     }
   }
 
+  async getUserPosts(req, res) {
+    try {
+      const user_id = req.user.id;
+      console.log(user_id);
+
+      let posts = await Tweet.find({ author: user_id });
+      let retweets = await User.findById(user_id).populate({
+        path: "retweets",
+        model: "Tweet",
+        populate: {
+          model: "User",
+          path: "author",
+        },
+      });
+      const f_retweets = retweets.retweets;
+      res.status(200).json({ posts, f_retweets });
+    } catch (err) {
+      console.log(err);
+      res.status(401).json({ message: err.message });
+    }
+  }
+
   async deleteAll(req, res) {
     try {
       const delete_twees = await Tweet.deleteMany();
-      //   const delete_users = await User.deleteMany();
+      const delete_users = await User.deleteMany();
       res.status(228).json({ message: "all was deleted" });
     } catch (err) {
       console.log(err);
@@ -174,6 +196,31 @@ class TweetController {
       }).populate("author");
 
       res.status(200).json(comments);
+    } catch (err) {
+      console.log(err);
+      res.status(400).json({ message: err.message });
+    }
+  }
+
+  async addRetweet(req, res) {
+    try {
+      const tweet_id = req.params.id;
+      const user = await User.findById(req.user.id);
+      const tweet = await Tweet.findById(tweet_id);
+
+      if (!tweet.retweetedBy.includes(req.user.id)) {
+        tweet.retweetedBy.push(user._id);
+        user.retweets.push(tweet_id);
+      } else {
+        const tweet_index = user.retweets.indexOf(tweet_id);
+        const user_index = tweet.retweetedBy.indexOf(user.id);
+        user.retweets.splice(tweet_index, 1);
+        tweet.retweetedBy.splice(user_index, 1);
+      }
+      tweet.save();
+      user.save();
+
+      res.status(200).json({ user, tweet });
     } catch (err) {
       console.log(err);
       res.status(400).json({ message: err.message });
