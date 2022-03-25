@@ -1,5 +1,6 @@
 import Tweet from "../models/Tweet.js";
 import User from "../models/User.js";
+import ReTweet from "../models/ReTweet.js";
 
 class TweetController {
   async create(req, res) {
@@ -34,20 +35,45 @@ class TweetController {
 
   async getUserPosts(req, res) {
     try {
-      const user_id = req.user.id;
+      const { user_id } = req.params;
       console.log(user_id);
 
       let posts = await Tweet.find({ author: user_id });
-      let retweets = await User.findById(user_id).populate({
-        path: "retweets",
+      let retweets = await ReTweet.find({
+        author: user_id,
+      }).populate({
+        path: "tweet",
         model: "Tweet",
         populate: {
-          model: "User",
           path: "author",
+          model: "User",
         },
       });
-      const f_retweets = retweets.retweets;
-      res.status(200).json({ posts, f_retweets });
+
+      const mod_retweet = retweets.map((item) => {
+        let thing = new Object();
+        thing.content = item.tweet.content;
+        thing.authot = item.tweet.author;
+        thing.createdAt = item.createdAt;
+        thing.updatedAt = item.createdAt;
+        thing._id = item._id;
+        thing.likes = item.tweet.likes;
+        thing.likedBy = item.tweet.likedBy;
+        thing.comments = item.tweet.comments;
+        thing.commentTo = item.tweet.commentTo;
+        thing.threadId = item.tweet.threadId;
+        thing.retweetedBy = item.tweet.retweetedBy;
+        thing.isRetweet = true;
+        return thing;
+      });
+
+      const byField = (field) => {
+        return (a, b) => (a[field] > b[field] ? 1 : -1);
+      };
+
+      const result = posts.concat(mod_retweet).sort(byField("createdAt"));
+
+      res.status(200).json({ result });
     } catch (err) {
       console.log(err);
       res.status(401).json({ message: err.message });
@@ -201,7 +227,7 @@ class TweetController {
       res.status(400).json({ message: err.message });
     }
   }
-
+  /*
   async addRetweet(req, res) {
     try {
       const tweet_id = req.params.id;
@@ -226,6 +252,7 @@ class TweetController {
       res.status(400).json({ message: err.message });
     }
   }
+*/
 }
 
 export default new TweetController();

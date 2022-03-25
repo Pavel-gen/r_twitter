@@ -4,6 +4,7 @@ import UserController from "./controllers/UserController.js";
 import { check } from "express-validator";
 import authMiddleware from "./middleware/authMiddleware.js";
 import uploadingImg from "./middleware/imgUploading.js";
+import ReTweetController from "./controllers/ReTweetController.js";
 
 const router = Router();
 
@@ -16,7 +17,11 @@ router.post(
 router.get("/posts", authMiddleware, TweetController.getAll);
 router.get("/posts/:id", TweetController.getOne);
 
-router.get("/tweets/spec", authMiddleware, TweetController.getUserPosts);
+router.get(
+  "/tweets/spec/:user_id",
+  authMiddleware,
+  TweetController.getUserPosts
+);
 
 //router.get("/posts/thread/:id", TweetController.getCurrentThread);
 router.get("/posts/coms/:id", TweetController.getComments);
@@ -28,7 +33,23 @@ router.post(
   authMiddleware,
   TweetController.addComment
 );
-router.put("/posts/retweet/:id", authMiddleware, TweetController.addRetweet);
+router.post(
+  "/posts/retweet/:tweet_id",
+  authMiddleware,
+  ReTweetController.create
+);
+
+router.get(
+  "/posts/retweet/:tweet_id",
+  authMiddleware,
+  ReTweetController.getRetweets
+);
+router.delete(
+  "/posts/retweet/:retweet_id",
+  authMiddleware,
+  ReTweetController.delete
+);
+
 router.get("/posts/thread/:id", TweetController.getCurrentThread);
 
 router.post(
