@@ -55,7 +55,7 @@ const ReTweet = async (id) => {
   }
 };
 
-const deleteRetweet = async (id) => {
+const deleteRetweet = async (id, dispatch, el) => {
   try {
     const url = `http://localhost:4000/api/posts/retweet/${id}`;
     const token = localStorage.getItem("token");
@@ -66,7 +66,8 @@ const deleteRetweet = async (id) => {
         Authorization: "Bearer " + token,
       },
     });
-
+    showMenu(el);
+    dispatch(delete_post(id));
     console.log(deleted);
   } catch (err) {
     console.log(err.message);
@@ -346,6 +347,27 @@ const Tweet = ({
                   <div className="foot_t foot_t_ch">
                     <span>
                       <i
+                        className="fa fa-comment  tweet_comment"
+                        aria-hidden="true"
+                        onClick={(e) => {
+                          dispatch(changed_content(content));
+                          dispatch(choose_user(author));
+                          dispatch(changed_id(_id));
+                          toggleModel("commentmodel");
+                        }}
+                      ></i>
+                      {comments.length}
+                    </span>
+
+                    <span>
+                      <i
+                        className="fa fa-retweet retweet"
+                        aria-hidden="true"
+                      ></i>
+                      {retweetLen}
+                    </span>
+                    <span>
+                      <i
                         className={
                           likeCondition
                             ? "fa fa-heart like pressed_like"
@@ -359,13 +381,192 @@ const Tweet = ({
                       ></i>
                       {altLikes !== 0 && altLikes}
                     </span>
-                    <span>
-                      <i
-                        className="fa fa-retweet retweet"
-                        aria-hidden="true"
-                      ></i>
-                      2
-                    </span>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
+          {!subtype && (
+            <>
+              <div
+                id={_id}
+                className={
+                  type == "base" || isRetweet
+                    ? next_post == undefined
+                      ? "container_t"
+                      : "container_t tweet_base"
+                    : "container_t tweet_thread"
+                }
+              >
+                <div>
+                  <img
+                    className="img_post"
+                    src={`http://localhost:4000/${author.avatar}`}
+                    onClick={() => {
+                      navigate(`/profile/${author._id}`, {
+                        replace: true,
+                      });
+                    }}
+                  />
+                  {next_post && (
+                    <div className="comment_space">
+                      <div className="comment_stick"></div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="payload">
+                  {isRetweet && (
+                    <div className="retweet_bar">
+                      <div className="retweet_to">retweeted</div>
+
+                      {/* <div
+                        className="reply_to_author"
+                        onClick={() => {
+                          navigate(`/profile/${retweet_auth}`);
+                        }}
+                      >
+                        {retweet_auth}
+                      </div>
+                      */}
+                    </div>
+                  )}
+                  <div className="header_t">
+                    <div className="title_left">
+                      <h4
+                        className="title_t"
+                        onClick={() => {
+                          navigate(`/profile/${author._id}`, { replace: true });
+                        }}
+                      >
+                        {author.username}
+                      </h4>
+                      <p>{moment(createdAt).fromNow()}</p>
+                      {commentTo && (
+                        <>
+                          <div className="reply_to">replyTo:</div>
+                          <div
+                            className="reply_to_author"
+                            onClick={() => {
+                              navigate(`/tweets/${commentTo}`);
+                            }}
+                          >
+                            {commentTo}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                    <div className="start_cont">
+                      <button
+                        onClick={(e) => showMenu(e.currentTarget)}
+                        className="btn_start "
+                      >
+                        <i className="fa fa-cog"></i>
+                      </button>
+                      <div className="btn_container">
+                        {isRetweet ? (
+                          retweet_auth == user_id ? (
+                            <button
+                              onClick={(e) =>
+                                deleteRetweet(
+                                  target_tweet,
+                                  dispatch,
+                                  e.currentTarget.parentElement
+                                )
+                              }
+                              className="btn btn_delete"
+                            >
+                              delete my retweet
+                            </button>
+                          ) : (
+                            <button
+                              className="btn btn_delete"
+                              onClick={(e) =>
+                                showMenu(e.currentTarget.parentElement)
+                              }
+                            >
+                              отмена
+                            </button>
+                          )
+                        ) : author._id == user_id ? (
+                          <>
+                            <button
+                              onClick={(e) =>
+                                removePost(
+                                  _id,
+                                  dispatch,
+                                  e.currentTarget.parentElement
+                                )
+                              }
+                              className="btn btn_delete"
+                            >
+                              delete
+                            </button>
+                            <button
+                              className="btn btn_update"
+                              onClick={(e) => {
+                                dispatch(changed_content(content));
+                                dispatch(choose_user(author));
+                                dispatch(changed_id(_id));
+                                toggleModel("editmodel");
+                                showMenu(e.currentTarget.parentElement);
+                              }}
+                            >
+                              update
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button
+                              className="btn btn_delete"
+                              onClick={(e) =>
+                                navigate(`/profile/${author._id}`, {
+                                  replace: true,
+                                })
+                              }
+                            >
+                              перейте к профилю
+                            </button>
+                            <button
+                              className="btn btn_delete"
+                              onClick={(e) =>
+                                showMenu(e.currentTarget.parentElement)
+                              }
+                            >
+                              отмена
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    className="content_t"
+                    onClick={() => {
+                      dispatch(
+                        choose_post({
+                          author,
+                          content,
+                          createdAt,
+                          _id,
+                          likes,
+                          likedBy,
+                          type,
+                          thread: [],
+                          origin_length,
+                          base_id,
+                          commentTo,
+                          protocol,
+                          comments,
+                        })
+                      );
+                      navigate(`/tweets/${_id}`);
+                    }}
+                  >
+                    {content}
+                  </div>
+                  <div className="foot_t">
                     <span>
                       <i
                         className="fa fa-comment  tweet_comment"
@@ -379,212 +580,39 @@ const Tweet = ({
                       ></i>
                       {comments.length}
                     </span>
+                    <span>
+                      <i
+                        className={
+                          retweetedBy.includes(user_id)
+                            ? "fa fa-retweet retweet retweet_clicked"
+                            : "fa fa-retweet retweet retweet"
+                        }
+                        aria-hidden="true"
+                        onClick={(e) => {
+                          ReTweet(_id);
+                        }}
+                      ></i>
+                      {retweetLen}
+                    </span>
+                    <span>
+                      <i
+                        className={
+                          likeCondition
+                            ? "fa fa-heart like pressed_like"
+                            : "fa fa-heart like"
+                        }
+                        aria-hidden="true"
+                        onClick={(e) => {
+                          e.currentTarget.classList.toggle("pressed_like");
+                          Like();
+                        }}
+                      ></i>
+                      {altLikes !== 0 && altLikes}
+                    </span>
                   </div>
                 </div>
               </div>
             </>
-          )}
-
-          {!subtype && (
-            <div
-              id={_id}
-              className={
-                type == "base"
-                  ? next_post == undefined
-                    ? "container_t"
-                    : "container_t tweet_base"
-                  : "container_t tweet_thread"
-              }
-            >
-              <div>
-                <img
-                  className="img_post"
-                  src={`http://localhost:4000/${author.avatar}`}
-                  onClick={() => {
-                    navigate(`/profile/${author._id}`, {
-                      replace: true,
-                    });
-                  }}
-                />
-                {next_post && (
-                  <div className="comment_space">
-                    <div className="comment_stick"></div>
-                  </div>
-                )}
-              </div>
-
-              <div className="payload">
-                <div className="header_t">
-                  <div className="title_left">
-                    <h4
-                      className="title_t"
-                      onClick={() => {
-                        navigate(`/profile/${author._id}`, { replace: true });
-                      }}
-                    >
-                      {isRetweet && "retweet"}
-                      {author.username}
-                    </h4>
-                    <p>{moment(createdAt).fromNow()}</p>
-                    {commentTo && (
-                      <>
-                        <div className="reply_to">replyTo:</div>
-                        <div
-                          className="reply_to_author"
-                          onClick={() => {
-                            navigate(`/tweets/${commentTo}`);
-                          }}
-                        >
-                          {commentTo}
-                        </div>
-                      </>
-                    )}
-                  </div>
-                  <div className="start_cont">
-                    <button
-                      onClick={(e) => showMenu(e.currentTarget)}
-                      className="btn_start "
-                    >
-                      <i className="fa fa-cog"></i>
-                    </button>
-                    <div className="btn_container">
-                      {isRetweet ? (
-                        retweet_auth == user_id ? (
-                          <button
-                            onClick={(e) => deleteRetweet(target_tweet)}
-                            className="btn btn_delete"
-                          >
-                            delete my retweet
-                          </button>
-                        ) : (
-                          <button
-                            className="btn btn_delete"
-                            onClick={(e) =>
-                              showMenu(e.currentTarget.parentElement)
-                            }
-                          >
-                            отмена
-                          </button>
-                        )
-                      ) : author._id == user_id ? (
-                        <>
-                          <button
-                            onClick={(e) =>
-                              removePost(
-                                _id,
-                                dispatch,
-                                e.currentTarget.parentElement
-                              )
-                            }
-                            className="btn btn_delete"
-                          >
-                            delete
-                          </button>
-                          <button
-                            className="btn btn_update"
-                            onClick={(e) => {
-                              dispatch(changed_content(content));
-                              dispatch(choose_user(author));
-                              dispatch(changed_id(_id));
-                              toggleModel("editmodel");
-                              showMenu(e.currentTarget.parentElement);
-                            }}
-                          >
-                            update
-                          </button>
-                        </>
-                      ) : (
-                        <>
-                          <button
-                            className="btn btn_delete"
-                            onClick={(e) =>
-                              navigate(`/profile/${author._id}`, {
-                                replace: true,
-                              })
-                            }
-                          >
-                            перейте к профилю
-                          </button>
-                          <button
-                            className="btn btn_delete"
-                            onClick={(e) =>
-                              showMenu(e.currentTarget.parentElement)
-                            }
-                          >
-                            отмена
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                <div
-                  className="content_t"
-                  onClick={() => {
-                    dispatch(
-                      choose_post({
-                        author,
-                        content,
-                        createdAt,
-                        _id,
-                        likes,
-                        likedBy,
-                        type,
-                        thread: [],
-                        origin_length,
-                        base_id,
-                        commentTo,
-                        protocol,
-                        comments,
-                      })
-                    );
-                    navigate(`/tweets/${_id}`);
-                  }}
-                >
-                  {content}
-                </div>
-                <div className="foot_t">
-                  <span>
-                    <i
-                      className={
-                        likeCondition
-                          ? "fa fa-heart like pressed_like"
-                          : "fa fa-heart like"
-                      }
-                      aria-hidden="true"
-                      onClick={(e) => {
-                        e.currentTarget.classList.toggle("pressed_like");
-                        Like();
-                      }}
-                    ></i>
-                    {altLikes !== 0 && altLikes}
-                  </span>
-                  <span>
-                    <i
-                      className="fa fa-retweet retweet"
-                      aria-hidden="true"
-                      onClick={(e) => {
-                        ReTweet(_id);
-                      }}
-                    ></i>
-                    {retweetLen}
-                  </span>
-                  <span>
-                    <i
-                      className="fa fa-comment  tweet_comment"
-                      aria-hidden="true"
-                      onClick={(e) => {
-                        dispatch(changed_content(content));
-                        dispatch(choose_user(author));
-                        dispatch(changed_id(_id));
-                        toggleModel("commentmodel");
-                      }}
-                    ></i>
-                    {comments.length}
-                  </span>
-                </div>
-              </div>
-            </div>
           )}
         </>
       )}

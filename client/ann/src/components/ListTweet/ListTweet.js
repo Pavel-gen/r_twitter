@@ -58,6 +58,7 @@ const ListTweet = ({ posts, user, protocol }) => {
   if (protocol == "choosen_post") {
     allowed_posts = posts;
   }
+  console.log(allowed_posts);
 
   // console.log(check_arr);
   // если сейчас делать локально то нудеа фнкция которая зашьёт в комменты потенциальный тред
@@ -102,7 +103,9 @@ const ListTweet = ({ posts, user, protocol }) => {
             //            let thread = current_thread(post._id, post.author._id);
             let thread;
             if (protocol !== "thread") {
-              thread = posts.filter((item) => item.threadId == post._id);
+              thread = posts.filter(
+                (item) => (item.threadId == post._id) & !item.isRetweet
+              );
               thread.sort((b, a) => {
                 return new Date(b.createdAt) - new Date(a.createdAt);
               });

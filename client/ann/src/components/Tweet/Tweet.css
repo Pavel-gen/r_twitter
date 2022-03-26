@@ -251,3 +251,25 @@
   padding-left: 1.25rem;
   font-size: 1.1rem;
 }
+
+.retweet_bar {
+  display: flex;
+}
+.retweet_to {
+  color: rgb(0, 0, 0);
+}
+
+.retweet {
+  transition: all 0.3s linear;
+  color: rgb(214, 206, 206);
+  padding: 0.45rem;
+}
+
+.retweet:hover {
+  background-color: rgba(29, 201, 29, 0.612);
+  color: rgb(132, 126, 126);
+}
+
+.retweet_clicked {
+  color: rgb(29, 201, 29);
+}
