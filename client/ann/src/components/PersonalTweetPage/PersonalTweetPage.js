@@ -27,6 +27,14 @@ const PersonalTweetPage = () => {
   const { id } = useParams();
   const choosen_post = useSelector((state) => state.first_blood.this_post);
 
+  const getCurPost = async (id) => {
+    const url = `http://localhost:4000/api/posts/${id}`;
+    const prev_post = await fetch(url);
+    const result = await prev_post.json();
+    setCurrentPost(result);
+    localStorage.setItem("current_post", JSON.stringify(result));
+  };
+
   useEffect(async () => {
     setLoading(true);
     setCurrentPost(null);
@@ -51,15 +59,15 @@ const PersonalTweetPage = () => {
         );
       } else {
         console.log(id);
-        const url = `http://localhost:4000/api/posts/${id}`;
-        const prev_post = await fetch(url);
-        const result = await prev_post.json();
-        setCurrentPost(result);
-        localStorage.setItem("current_post", JSON.stringify(result));
+        getCurPost(id);
       }
     } else {
-      let post = localStorage.getItem("current_post");
-      setCurrentPost(JSON.parse(post));
+      let post = JSON.parse(localStorage.getItem("current_post"));
+      if (post) {
+        setCurrentPost(post);
+      } else {
+        getCurPost(id);
+      }
     }
   }, [choosen_post, document.location.href]);
 

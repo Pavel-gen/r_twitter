@@ -9,18 +9,21 @@ import TweetToolBar from "./TweetToolBar/TweetToolBar";
 import Loading from "../Loading/Loading";
 import { useParams } from "react-router-dom";
 
-const getPosts = async () => {
+const getPosts = async (id) => {
   const token = localStorage.getItem("token");
   if (!token) {
     return <p>Пользователь не авторизован</p>;
   }
-  const posts = await fetch("http://localhost:4000/api/posts", {
+  const old_url = "http://localhost:4000/api/posts";
+  const new_url = `http://localhost:4000/api/tweets/spec/${id}`;
+  const posts = await fetch(new_url, {
     method: "GET",
     headers: {
       Authorization: "Bearer " + String(token),
     },
   });
   let result = await posts.json();
+  console.log(result);
 
   result.sort((a, b) => {
     return new Date(b.createdAt) - new Date(a.createdAt);
@@ -94,7 +97,7 @@ const User = ({ type }) => {
 
     const user_id = localStorage.getItem("user_id");
     console.log(user_id);
-    let data = await getPosts();
+    let data = await getPosts(id);
     console.log(data);
 
     if (data.length == 0) {
@@ -103,7 +106,7 @@ const User = ({ type }) => {
     }
 
     if (data && data.length > 0) {
-      data = data.filter((post) => post.author._id == id);
+      // data = data.filter((post) => post.author._id == id);
       data.map((post) => {
         console.log(post.author.username, " : ", post.content);
       });

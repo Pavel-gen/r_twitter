@@ -38,7 +38,7 @@ class TweetController {
       const { user_id } = req.params;
       console.log(user_id);
 
-      let posts = await Tweet.find({ author: user_id });
+      let posts = await Tweet.find({ author: user_id }).populate("author");
       let retweets = await ReTweet.find({
         author: user_id,
       }).populate({
@@ -53,16 +53,18 @@ class TweetController {
       const mod_retweet = retweets.map((item) => {
         let thing = new Object();
         thing.content = item.tweet.content;
-        thing.authot = item.tweet.author;
+        thing.author = item.tweet.author;
         thing.createdAt = item.createdAt;
-        thing.updatedAt = item.createdAt;
+        thing.base_tweet_createdAt = item.tweet.createdAt;
         thing._id = item._id;
+        thing.target_tweet = item.tweet._id;
         thing.likes = item.tweet.likes;
         thing.likedBy = item.tweet.likedBy;
         thing.comments = item.tweet.comments;
         thing.commentTo = item.tweet.commentTo;
         thing.threadId = item.tweet.threadId;
         thing.retweetedBy = item.tweet.retweetedBy;
+        thing.retweet_auth = item.author;
         thing.isRetweet = true;
         return thing;
       });
@@ -73,7 +75,7 @@ class TweetController {
 
       const result = posts.concat(mod_retweet).sort(byField("createdAt"));
 
-      res.status(200).json({ result });
+      res.status(200).json(result);
     } catch (err) {
       console.log(err);
       res.status(401).json({ message: err.message });
@@ -83,7 +85,8 @@ class TweetController {
   async deleteAll(req, res) {
     try {
       const delete_twees = await Tweet.deleteMany();
-      const delete_users = await User.deleteMany();
+      // const delete_users = await User.deleteMany();
+      const delete_retweets = await ReTweet.deleteMany();
       res.status(228).json({ message: "all was deleted" });
     } catch (err) {
       console.log(err);

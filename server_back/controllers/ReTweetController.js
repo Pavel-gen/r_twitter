@@ -41,6 +41,7 @@ class ReTweetContropller {
       if (deleted) {
         const retweets = await ReTweet.find({
           tweet: deleted.tweet,
+          author: deleted.author,
         });
 
         if (retweets.length == 0) {

@@ -50,7 +50,9 @@ const ListTweet = ({ posts, user, protocol }) => {
     allowed_posts = posts.filter((item) => item.threadId == null);
   }
   if (protocol == "profile_tweets") {
-    allowed_posts = posts.filter((item) => item.threadId == null);
+    allowed_posts = posts.filter(
+      (item) => item.threadId == null || item.isRetweet
+    );
   }
 
   if (protocol == "choosen_post") {
@@ -111,18 +113,11 @@ const ListTweet = ({ posts, user, protocol }) => {
             return (
               <Tweet
                 key={post._id}
-                author={post.author}
-                content={post.content}
-                date={post.createdAt}
-                id={post._id}
-                likes={post.likes}
-                likedBy={post.likedBy}
+                {...post}
                 thread={thread}
                 type={post.threadId == null ? "base" : "comment"}
-                replyTo={post.commentTo}
                 origin_length={thread.length}
                 protocol={protocol}
-                comments={post.comments}
                 subtype={null}
               />
             );

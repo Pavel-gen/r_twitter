@@ -17,6 +17,7 @@ import Model from "../Model/Model";
 import toggleModel from "../Model/toggleModel";
 import { choose_user } from "../../fearutures/userSlice";
 import { useNavigate } from "react-router-dom";
+import ClassicalTweet from "./ClassicalTweet";
 
 const showMenu = (el) => {
   const parent = el.parentElement;
@@ -36,6 +37,41 @@ const removePost = async (id, dispatch, el) => {
   }
 };
 
+const ReTweet = async (id) => {
+  try {
+    const url = `http://localhost:4000/api/posts/retweet/${id}`;
+    const token = localStorage.getItem("token");
+    const addedRetweet = await fetch(url, {
+      method: "POST",
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+    });
+    console.log(addedRetweet);
+  } catch (err) {
+    console.log(err.message);
+  }
+};
+
+const deleteRetweet = async (id) => {
+  try {
+    const url = `http://localhost:4000/api/posts/retweet/${id}`;
+    const token = localStorage.getItem("token");
+    const deleted = await fetch(url, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+    });
+
+    console.log(deleted);
+  } catch (err) {
+    console.log(err.message);
+  }
+};
 //const toggleModel = (el, content) => {
 //    try {
 //        const model = document.getElementById('editmodel')
@@ -60,18 +96,23 @@ const removePost = async (id, dispatch, el) => {
 const Tweet = ({
   author,
   content,
-  date,
-  id,
+  createdAt,
+  _id,
   likes,
   likedBy,
   type,
   thread,
   origin_length,
   base_id,
-  replyTo,
+  commentTo,
   protocol,
   comments,
   subtype,
+  retweetedBy,
+  isRetweet,
+  target_tweet,
+  updatedAt,
+  retweet_auth,
 }) => {
   const user_id = localStorage.getItem("user_id");
   const startLikeCondition = likedBy.includes(user_id);
@@ -79,10 +120,17 @@ const Tweet = ({
   const [alt_content, setContent] = useState(content);
   const deleted_id = useSelector((state) => state.first_blood.id);
   const [altLikes, setAltLikes] = useState(likes);
+  const [retweetLen, setRetweetLen] = useState(retweetedBy.length);
+
   const [likeCondition, setLikeCondition] = useState(startLikeCondition);
   let next_post;
   if (thread) {
     next_post = thread[0];
+  }
+
+  if (isRetweet) {
+    [_id, target_tweet] = [target_tweet, _id];
+    [createdAt, updatedAt] = [updatedAt, createdAt];
   }
 
   //  console.log(thread);
@@ -102,7 +150,7 @@ const Tweet = ({
 
   const Like = async () => {
     try {
-      const url = `http://localhost:4000/api/posts/${id}/likes`;
+      const url = `http://localhost:4000/api/posts/${_id}/likes`;
       const token = localStorage.getItem("token");
       const request = await fetch(url, {
         method: "PUT",
@@ -127,7 +175,7 @@ const Tweet = ({
   const navigate = useNavigate();
 
   if (type == "base") {
-    base_id = id;
+    base_id = _id;
   }
   if (protocol == "thread" && type == "base") {
     subtype = "choosen_post";
@@ -148,7 +196,7 @@ const Tweet = ({
                 <button
                   className="show_btn"
                   onClick={() => {
-                    navigate(`/tweets/thread/${id}`);
+                    navigate(`/tweets/thread/${_id}`);
                   }}
                 >
                   show thread
@@ -160,7 +208,7 @@ const Tweet = ({
           {subtype == "choosen_post" && (
             <>
               <div
-                id={id}
+                id={_id}
                 className={
                   type == "base"
                     ? next_post == undefined
@@ -191,17 +239,20 @@ const Tweet = ({
                         >
                           {author.username}
                         </h4>
-                        <p className="choosed_p"> {moment(date).fromNow()}</p>
-                        {replyTo && (
+                        <p className="choosed_p">
+                          {" "}
+                          {moment(createdAt).fromNow()}
+                        </p>
+                        {commentTo && (
                           <>
                             <div className="reply_to">replyTo:</div>
                             <div
                               className="reply_to_author"
                               onClick={() => {
-                                navigate(`/tweets/${replyTo}`);
+                                navigate(`/tweets/${commentTo}`);
                               }}
                             >
-                              {replyTo}
+                              {commentTo}
                             </div>
                           </>
                         )}
@@ -223,7 +274,7 @@ const Tweet = ({
                             className="btn btn_delete"
                             onClick={(e) =>
                               removePost(
-                                id,
+                                _id,
                                 dispatch,
                                 e.currentTarget.parentElement
                               )
@@ -236,7 +287,7 @@ const Tweet = ({
                             onClick={(e) => {
                               dispatch(changed_content(content));
                               dispatch(choose_user(author));
-                              dispatch(changed_id(id));
+                              dispatch(changed_id(_id));
                               toggleModel("editmodel");
                               showMenu(e.currentTarget.parentElement);
                             }}
@@ -274,20 +325,20 @@ const Tweet = ({
                         choose_post({
                           author,
                           content,
-                          date,
-                          id,
+                          createdAt,
+                          _id,
                           likes,
                           likedBy,
                           type,
                           thread: [],
                           origin_length,
                           base_id,
-                          commentTo: replyTo,
+                          commentTo,
                           protocol,
                           comments,
                         })
                       );
-                      navigate(`/tweets/${id}`);
+                      navigate(`/tweets/${_id}`);
                     }}
                   >
                     {content}
@@ -322,7 +373,7 @@ const Tweet = ({
                         onClick={(e) => {
                           dispatch(changed_content(content));
                           dispatch(choose_user(author));
-                          dispatch(changed_id(id));
+                          dispatch(changed_id(_id));
                           toggleModel("commentmodel");
                         }}
                       ></i>
@@ -333,9 +384,10 @@ const Tweet = ({
               </div>
             </>
           )}
+
           {!subtype && (
             <div
-              id={id}
+              id={_id}
               className={
                 type == "base"
                   ? next_post == undefined
@@ -370,19 +422,20 @@ const Tweet = ({
                         navigate(`/profile/${author._id}`, { replace: true });
                       }}
                     >
+                      {isRetweet && "retweet"}
                       {author.username}
                     </h4>
-                    <p>{moment(date).fromNow()}</p>
-                    {replyTo && (
+                    <p>{moment(createdAt).fromNow()}</p>
+                    {commentTo && (
                       <>
                         <div className="reply_to">replyTo:</div>
                         <div
                           className="reply_to_author"
                           onClick={() => {
-                            navigate(`/tweets/${replyTo}`);
+                            navigate(`/tweets/${commentTo}`);
                           }}
                         >
-                          {replyTo}
+                          {commentTo}
                         </div>
                       </>
                     )}
@@ -395,12 +448,30 @@ const Tweet = ({
                       <i className="fa fa-cog"></i>
                     </button>
                     <div className="btn_container">
-                      {author._id == user_id ? (
+                      {isRetweet ? (
+                        retweet_auth == user_id ? (
+                          <button
+                            onClick={(e) => deleteRetweet(target_tweet)}
+                            className="btn btn_delete"
+                          >
+                            delete my retweet
+                          </button>
+                        ) : (
+                          <button
+                            className="btn btn_delete"
+                            onClick={(e) =>
+                              showMenu(e.currentTarget.parentElement)
+                            }
+                          >
+                            отмена
+                          </button>
+                        )
+                      ) : author._id == user_id ? (
                         <>
                           <button
                             onClick={(e) =>
                               removePost(
-                                id,
+                                _id,
                                 dispatch,
                                 e.currentTarget.parentElement
                               )
@@ -414,7 +485,7 @@ const Tweet = ({
                             onClick={(e) => {
                               dispatch(changed_content(content));
                               dispatch(choose_user(author));
-                              dispatch(changed_id(id));
+                              dispatch(changed_id(_id));
                               toggleModel("editmodel");
                               showMenu(e.currentTarget.parentElement);
                             }}
@@ -454,20 +525,20 @@ const Tweet = ({
                       choose_post({
                         author,
                         content,
-                        date,
-                        id,
+                        createdAt,
+                        _id,
                         likes,
                         likedBy,
                         type,
                         thread: [],
                         origin_length,
                         base_id,
-                        commentTo: replyTo,
+                        commentTo,
                         protocol,
                         comments,
                       })
                     );
-                    navigate(`/tweets/${id}`);
+                    navigate(`/tweets/${_id}`);
                   }}
                 >
                   {content}
@@ -489,8 +560,14 @@ const Tweet = ({
                     {altLikes !== 0 && altLikes}
                   </span>
                   <span>
-                    <i className="fa fa-retweet retweet" aria-hidden="true"></i>
-                    2
+                    <i
+                      className="fa fa-retweet retweet"
+                      aria-hidden="true"
+                      onClick={(e) => {
+                        ReTweet(_id);
+                      }}
+                    ></i>
+                    {retweetLen}
                   </span>
                   <span>
                     <i
@@ -499,7 +576,7 @@ const Tweet = ({
                       onClick={(e) => {
                         dispatch(changed_content(content));
                         dispatch(choose_user(author));
-                        dispatch(changed_id(id));
+                        dispatch(changed_id(_id));
                         toggleModel("commentmodel");
                       }}
                     ></i>
@@ -515,16 +592,9 @@ const Tweet = ({
         {next_post && (
           <>
             <Tweet
-              replyTo={next_post.commentTo}
               type="comment"
               key={next_post._id}
-              author={next_post.author}
-              content={next_post.content}
-              date={next_post.createdAt}
-              id={next_post._id}
-              likes={next_post.likes}
-              likedBy={next_post.likedBy}
-              comments={next_post.comments}
+              {...next_post}
               thread={thread.filter((el) => el !== next_post)}
               origin_length={origin_length}
               base_id={base_id}
