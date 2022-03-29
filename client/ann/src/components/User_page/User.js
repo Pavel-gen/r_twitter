@@ -89,13 +89,13 @@ const User = ({ type }) => {
   }, [document.location.href]);
 
   const { id } = useParams();
+  const user_id = localStorage.getItem("user_id");
 
   useEffect(async () => {
     const url = `http://localhost:4000/api/users/${id}`;
     const user = await fetch(url);
     const current_user = await user.json();
 
-    const user_id = localStorage.getItem("user_id");
     console.log(user_id);
     let data = await getPosts(id);
     console.log(data);
@@ -107,9 +107,9 @@ const User = ({ type }) => {
 
     if (data && data.length > 0) {
       // data = data.filter((post) => post.author._id == id);
-      data.map((post) => {
-        console.log(post.author.username, " : ", post.content);
-      });
+      //data.map((post) => {
+      //  console.log(post.author.username, " : ", post.content);
+      //});
       setUser(current_user);
       const tweets = data.sort((a, b) => {
         return new Date(b.createdAt) - new Date(a.createdAt);
@@ -125,7 +125,7 @@ const User = ({ type }) => {
   }, [updated_user]);
 
   useEffect(() => {
-    if (added_post) {
+    if (added_post && id == user_id) {
       const new_post = added_post.payload;
       console.log(new_post);
       const lol = [new_post].concat(posts);

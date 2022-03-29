@@ -44,7 +44,10 @@ const ListTweet = ({ posts, user, protocol }) => {
     allowed_posts = posts.filter((post) => post.commentTo == null);
   }
   if (protocol == "likes") {
-    allowed_posts = posts;
+    allowed_posts = posts.map((post) => {
+      post.threadId = null;
+      return post;
+    });
   }
   if (protocol == "thread") {
     allowed_posts = posts.filter((item) => item.threadId == null);
@@ -58,6 +61,9 @@ const ListTweet = ({ posts, user, protocol }) => {
   if (protocol == "choosen_post") {
     allowed_posts = posts;
   }
+  allowed_posts.sort((a, b) => {
+    return new Date(b.createdAt) - new Date(a.createdAt);
+  });
   console.log(allowed_posts);
 
   // console.log(check_arr);

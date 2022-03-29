@@ -52,10 +52,10 @@ class TweetController {
 
       const mod_retweet = retweets.map((item) => {
         let thing = new Object();
+
         thing.content = item.tweet.content;
         thing.author = item.tweet.author;
-        thing.createdAt = item.createdAt;
-        thing.base_tweet_createdAt = item.tweet.createdAt;
+        thing.createdAt = item.tweet.createdAt;
         thing._id = item._id;
         thing.target_tweet = item.tweet._id;
         thing.likes = item.tweet.likes;
@@ -64,8 +64,8 @@ class TweetController {
         thing.commentTo = item.tweet.commentTo;
         thing.threadId = item.tweet.threadId;
         thing.retweetedBy = item.tweet.retweetedBy;
-        thing.retweet_auth = item.author;
         thing.isRetweet = true;
+        thing.retweet_auth = item.author;
         return thing;
       });
 
@@ -84,7 +84,7 @@ class TweetController {
 
   async deleteAll(req, res) {
     try {
-      const delete_twees = await Tweet.deleteMany();
+      //const delete_tweets = await Tweet.deleteMany();
       // const delete_users = await User.deleteMany();
       const delete_retweets = await ReTweet.deleteMany();
       res.status(228).json({ message: "all was deleted" });
@@ -141,6 +141,8 @@ class TweetController {
 
         target_tweet.save();
       }
+
+      const retweets = await ReTweet.deleteMany({ tweet: id });
       const deleted = await Tweet.findByIdAndDelete(id);
 
       res.status(200).json({ message: "deleted" }, target_tweet);

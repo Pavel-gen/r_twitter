@@ -7,6 +7,7 @@ import postSlice, {
   changed_content,
   changed_id,
   choose_post,
+  add_post,
 } from "../../fearutures/postSlice";
 import { useSelector, useDispatch } from "react-redux";
 import moment from "moment";
@@ -37,7 +38,7 @@ const removePost = async (id, dispatch, el) => {
   }
 };
 
-const ReTweet = async (id) => {
+const ReTweet = async (id, dispatch, subtype) => {
   try {
     const url = `http://localhost:4000/api/posts/retweet/${id}`;
     const token = localStorage.getItem("token");
@@ -50,6 +51,23 @@ const ReTweet = async (id) => {
       },
     });
     console.log(addedRetweet);
+    const result = await addedRetweet.json();
+    let created_retweet = result.retweet;
+
+    if (!subtype) {
+      created_retweet.retweet_auth = result.retweet.author;
+      created_retweet.target_tweet = result.base_tweet._id;
+      delete result.base_tweet.createdAt;
+      delete result.base_tweet._id;
+      delete created_retweet.author;
+      result.base_tweet.isRetweet = true;
+      console.log(result);
+      Object.assign(created_retweet, result.base_tweet);
+      created_retweet.createdAt = result.retweet.createdAt;
+      dispatch(add_post(created_retweet));
+    }
+
+    console.log({ ...created_retweet });
   } catch (err) {
     console.log(err.message);
   }
@@ -119,11 +137,16 @@ const Tweet = ({
   const startLikeCondition = likedBy.includes(user_id);
 
   const [alt_content, setContent] = useState(content);
-  const deleted_id = useSelector((state) => state.first_blood.id);
   const [altLikes, setAltLikes] = useState(likes);
   const [retweetLen, setRetweetLen] = useState(retweetedBy.length);
-
   const [likeCondition, setLikeCondition] = useState(startLikeCondition);
+  const [altRetweetedBy, setAltRetweetedBy] = useState(retweetedBy);
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const deleted_id = useSelector((state) => state.first_blood.id);
+
   let next_post;
   if (thread) {
     next_post = thread[0];
@@ -172,8 +195,6 @@ const Tweet = ({
       console.log(err);
     }
   };
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   if (type == "base") {
     base_id = _id;
@@ -361,8 +382,22 @@ const Tweet = ({
 
                     <span>
                       <i
-                        className="fa fa-retweet retweet"
+                        className={
+                          !altRetweetedBy.includes(user_id)
+                            ? "fa fa-retweet retweet"
+                            : "fa fa-retweet retweet retweet_clicked"
+                        }
                         aria-hidden="true"
+                        onClick={(e) => {
+                          ReTweet(_id, dispatch, subtype);
+
+                          if (!altRetweetedBy.includes(user_id)) {
+                            console.log(altRetweetedBy);
+                            setAltRetweetedBy(altRetweetedBy.concat([user_id]));
+                            e.currentTarget.classList.toggle("retweet_clicked");
+                            setRetweetLen(retweetLen + 1);
+                          }
+                        }}
                       ></i>
                       {retweetLen}
                     </span>
@@ -589,7 +624,14 @@ const Tweet = ({
                         }
                         aria-hidden="true"
                         onClick={(e) => {
-                          ReTweet(_id);
+                          ReTweet(_id, dispatch);
+
+                          if (!altRetweetedBy.includes(user_id)) {
+                            console.log(altRetweetedBy);
+                            setAltRetweetedBy(altRetweetedBy.concat([user_id]));
+                            e.currentTarget.classList.toggle("retweet_clicked");
+                            setRetweetLen(retweetLen + 1);
+                          }
                         }}
                       ></i>
                       {retweetLen}
@@ -617,7 +659,7 @@ const Tweet = ({
         </>
       )}
       <>
-        {next_post && (
+        {next_post && !isRetweet && (
           <>
             <Tweet
               type="comment"

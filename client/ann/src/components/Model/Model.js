@@ -57,6 +57,7 @@ const Model = ({ id, operation, start_content }) => {
       });
       const result = await post.json();
       result.author = localAuthor;
+      console.log(localAuthor);
       dispatch(add_post(result));
       setContent("");
       toggleModel("postmodel");

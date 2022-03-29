@@ -9,12 +9,11 @@ class ReTweetContropller {
         author: req.user.id,
         tweet: tweet_id,
       });
-      const base_tweet = await Tweet.findById(tweet_id);
+      const base_tweet = await Tweet.findById(tweet_id).populate("author");
       if (!base_tweet.retweetedBy.includes(req.user.id)) {
         base_tweet.retweetedBy.push(req.user.id);
         base_tweet.save();
       }
-
       res.status(200).json({ retweet, base_tweet });
     } catch (err) {
       console.log(err);
