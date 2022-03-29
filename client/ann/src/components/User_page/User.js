@@ -8,6 +8,7 @@ import Model from "../Model/Model";
 import TweetToolBar from "./TweetToolBar/TweetToolBar";
 import Loading from "../Loading/Loading";
 import { useParams } from "react-router-dom";
+import { MiddlewareArray } from "@reduxjs/toolkit";
 
 const getPosts = async (id) => {
   const token = localStorage.getItem("token");
@@ -125,12 +126,24 @@ const User = ({ type }) => {
   }, [updated_user]);
 
   useEffect(() => {
-    if (added_post && id == user_id) {
+    if (added_post && id == user_id && !added_post.payload.commentTo) {
       const new_post = added_post.payload;
       console.log(new_post);
       const lol = [new_post].concat(posts);
       setPosts(lol);
       console.log(lol);
+    }
+    if (added_post && added_post.payload.commentTo) {
+      const new_post = added_post.payload;
+      const ch_posts = [new_post].concat(posts);
+      setPosts(
+        ch_posts.map((post) => {
+          if (new_post.commentTo == post._id) {
+            post.comments = post.comments.concat([new_post._id]);
+          }
+          return post;
+        })
+      );
     }
   }, [added_post]);
 
