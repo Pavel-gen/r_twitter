@@ -154,7 +154,6 @@ const Tweet = ({
 
   if (isRetweet) {
     [_id, target_tweet] = [target_tweet, _id];
-    [createdAt, updatedAt] = [updatedAt, createdAt];
   }
 
   //  console.log(thread);

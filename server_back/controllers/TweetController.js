@@ -55,7 +55,7 @@ class TweetController {
 
         thing.content = item.tweet.content;
         thing.author = item.tweet.author;
-        thing.createdAt = item.tweet.createdAt;
+        thing.createdAt = item.createdAt;
         thing._id = item._id;
         thing.target_tweet = item.tweet._id;
         thing.likes = item.tweet.likes;

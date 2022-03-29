@@ -84,19 +84,19 @@ const Home = () => {
     }
   }, [id_check]);
 
-  console.log(posts);
-  if (posts) {
+  console.log(!posts);
+  if (!posts) {
     return (
       <div>
         <ToolBar />
-        <ListTweet posts={posts} user={"-"} protocol="base" />
+        <Loading />
       </div>
     );
   } else {
     return (
       <>
         <ToolBar />
-        <Loading />
+        <ListTweet posts={posts} user={"-"} protocol="base" />
       </>
     );
   }
