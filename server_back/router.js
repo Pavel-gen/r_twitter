@@ -5,6 +5,7 @@ import { check } from "express-validator";
 import authMiddleware from "./middleware/authMiddleware.js";
 import uploadingImg from "./middleware/imgUploading.js";
 import ReTweetController from "./controllers/ReTweetController.js";
+import Tweet from "./models/Tweet.js";
 
 const router = Router();
 
@@ -22,6 +23,8 @@ router.get(
   authMiddleware,
   TweetController.getUserPosts
 );
+
+router.get("/tweets/line", authMiddleware, TweetController.getUserLine);
 
 //router.get("/posts/thread/:id", TweetController.getCurrentThread);
 router.get("/posts/coms/:id", TweetController.getComments);

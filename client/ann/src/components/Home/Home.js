@@ -12,7 +12,7 @@ export const getPosts = async () => {
   if (!token) {
     return <p>Пользователь не авторизован</p>;
   }
-  const posts = await fetch("http://localhost:4000/api/posts", {
+  const posts = await fetch("http://localhost:4000/api/tweets/line", {
     method: "GET",
     headers: {
       Authorization: "Bearer " + String(token),
@@ -39,8 +39,10 @@ const getUser = async () => {
 };
 
 const Home = () => {
-  const [posts, setPosts] = useState(null);
+  const [posts, setPosts] = useState([]);
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
   const dispatch = useDispatch();
   const added_post = useSelector((state) => state.first_blood.added_post);
   const updated_post = useSelector((state) => state.first_blood.updated_post);
@@ -48,6 +50,7 @@ const Home = () => {
   useEffect(async () => {
     const lol = await getPosts();
     setPosts(lol);
+    setLoading(false);
   }, []);
 
   useEffect(() => {
@@ -84,8 +87,7 @@ const Home = () => {
     }
   }, [id_check]);
 
-  console.log(!posts);
-  if (!posts) {
+  if (loading) {
     return (
       <div>
         <ToolBar />
@@ -96,7 +98,7 @@ const Home = () => {
     return (
       <>
         <ToolBar />
-        <ListTweet posts={posts} user={"-"} protocol="base" />
+        <ListTweet posts={posts} user={"-"} protocol="profile_tweets" />
       </>
     );
   }

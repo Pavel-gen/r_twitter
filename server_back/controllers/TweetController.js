@@ -2,6 +2,32 @@ import Tweet from "../models/Tweet.js";
 import User from "../models/User.js";
 import ReTweet from "../models/ReTweet.js";
 
+const convertReToTw = (arr) => {
+  const result = arr.map((item) => {
+    let thing = new Object();
+
+    thing.content = item.tweet.content;
+    thing.author = item.tweet.author;
+    thing.createdAt = item.createdAt;
+    thing._id = item._id;
+    thing.target_tweet = item.tweet._id;
+    thing.likes = item.tweet.likes;
+    thing.likedBy = item.tweet.likedBy;
+    thing.comments = item.tweet.comments;
+    thing.commentTo = item.tweet.commentTo;
+    thing.threadId = item.tweet.threadId;
+    thing.retweetedBy = item.tweet.retweetedBy;
+    thing.isRetweet = true;
+    thing.retweet_auth = item.author;
+    return thing;
+  });
+  return result;
+};
+
+const byField = (field) => {
+  return (a, b) => (a[field] > b[field] ? 1 : -1);
+};
+
 class TweetController {
   async create(req, res) {
     try {
@@ -49,7 +75,10 @@ class TweetController {
           model: "User",
         },
       });
+      const mod_retweet = convertReToTw(retweets);
 
+      {
+        /*
       const mod_retweet = retweets.map((item) => {
         let thing = new Object();
 
@@ -68,10 +97,8 @@ class TweetController {
         thing.retweet_auth = item.author;
         return thing;
       });
-
-      const byField = (field) => {
-        return (a, b) => (a[field] > b[field] ? 1 : -1);
-      };
+*/
+      }
 
       const result = posts.concat(mod_retweet).sort(byField("createdAt"));
 
@@ -232,6 +259,41 @@ class TweetController {
       res.status(400).json({ message: err.message });
     }
   }
+
+  async getUserLine(req, res) {
+    try {
+      const user_id = req.user.id;
+
+      const current_user = await User.findById(user_id);
+      const following = current_user.following.concat([user_id]);
+      const following_tweets = await Tweet.find({
+        author: { $in: following },
+      })
+        .populate("author")
+        .sort([["createdAt", -1]]);
+
+      let following_retweets = await ReTweet.find({
+        author: { $in: following },
+      }).populate({
+        path: "tweet",
+        model: "Tweet",
+        populate: {
+          path: "author",
+          model: "User",
+        },
+      });
+
+      const result = following_tweets
+        .concat(convertReToTw(following_retweets))
+        .sort(byField("createdAt"));
+
+      res.status(200).json(result);
+    } catch (err) {
+      console.log(err);
+      res.status(400).json({ message: err.message });
+    }
+  }
+
   /*
   async addRetweet(req, res) {
     try {

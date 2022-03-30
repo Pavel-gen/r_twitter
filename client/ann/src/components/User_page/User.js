@@ -68,7 +68,7 @@ const getUserLikes = async () => {
 };
 
 const User = ({ type }) => {
-  const [posts, setPosts] = useState(null);
+  const [posts, setPosts] = useState([]);
   const [user, setUser] = useState(null);
   const [likes, setLikes] = useState(null);
   const dispatch = useDispatch();
@@ -117,6 +117,7 @@ const User = ({ type }) => {
       });
       setPosts(tweets);
     }
+    window.scrollTo(0, 0);
   }, [id]);
 
   useEffect(() => {
@@ -127,18 +128,58 @@ const User = ({ type }) => {
 
   useEffect(() => {
     if (added_post && id == user_id && !added_post.payload.commentTo) {
-      const new_post = added_post.payload;
-      console.log(new_post);
+      const pre_post = { ...added_post.payload };
+      let new_post = JSON.parse(JSON.stringify(pre_post));
       const lol = [new_post].concat(posts);
       setPosts(lol);
       console.log(lol);
     }
-    if (added_post && added_post.payload.commentTo) {
-      const new_post = added_post.payload;
-      const ch_posts = [new_post].concat(posts);
+
+    if (added_post && added_post.payload.commentTo && id == user_id) {
+      const pre_post = { ...added_post.payload };
+      let new_post = JSON.parse(JSON.stringify(pre_post));
+
+      let ch_posts = [new_post].concat(posts);
+
+      console.log(ch_posts);
       setPosts(
         ch_posts.map((post) => {
-          if (new_post.commentTo == post._id) {
+          console.log(post);
+
+          let condition;
+          if (post.isRetweet) {
+            condition = new_post.commentTo == post.target_tweet;
+          } else {
+            condition = new_post.commentTo == post._id;
+          }
+
+          if (condition) {
+            post.comments = post.comments.concat([new_post._id]);
+          }
+          return post;
+        })
+      );
+    }
+
+    if (added_post && added_post.payload.commentTo && id !== user_id) {
+      const pre_post = { ...added_post.payload };
+      let new_post = JSON.parse(JSON.stringify(pre_post));
+
+      let ch_posts = posts;
+
+      console.log(ch_posts);
+      setPosts(
+        ch_posts.map((post) => {
+          console.log(post);
+
+          let condition;
+          if (post.isRetweet) {
+            condition = new_post.commentTo == post.target_tweet;
+          } else {
+            condition = new_post.commentTo == post._id;
+          }
+
+          if (condition) {
             post.comments = post.comments.concat([new_post._id]);
           }
           return post;
