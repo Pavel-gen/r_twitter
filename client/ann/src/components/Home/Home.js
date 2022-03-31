@@ -6,18 +6,25 @@ import { update } from "../../fearutures/postSlice";
 import ToolBar from "../ToolBar/ToolBar";
 import Model from "../Model/Model";
 import Loading from "../Loading/Loading";
+import "./Home.css";
+import { current } from "@reduxjs/toolkit";
 
-export const getPosts = async () => {
+export const getPosts = async (pg) => {
   const token = localStorage.getItem("token");
   if (!token) {
     return <p>Пользователь не авторизован</p>;
   }
-  const posts = await fetch("http://localhost:4000/api/tweets/line", {
-    method: "GET",
-    headers: {
-      Authorization: "Bearer " + String(token),
-    },
-  });
+  const posts = await fetch(
+    `http://localhost:4000/api/tweets/line?page=${pg}`,
+    {
+      method: "GET",
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+    }
+  );
   let result = await posts.json();
 
   result.sort((a, b) => {
@@ -40,18 +47,49 @@ const getUser = async () => {
 
 const Home = () => {
   const [posts, setPosts] = useState([]);
+  const [pg, setPg] = useState(1);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [lastId, setLastId] = useState(null);
 
   const dispatch = useDispatch();
   const added_post = useSelector((state) => state.first_blood.added_post);
   const updated_post = useSelector((state) => state.first_blood.updated_post);
 
   useEffect(async () => {
-    const lol = await getPosts();
+    const lol = await getPosts(pg);
     setPosts(lol);
     setLoading(false);
   }, []);
+
+  useEffect(() => {
+    console.log(posts);
+  }, [posts]);
+
+  useEffect(async () => {
+    const next_posts = await getPosts(pg);
+    if (next_posts.length > 0) {
+      setPosts(posts.concat(next_posts));
+    }
+  }, [pg]);
+
+  window.addEventListener("scroll", () => {
+    let item = document.getElementById("last_div");
+    let path = 0;
+    if (item) {
+      path = item.getBoundingClientRect().bottom;
+    }
+
+    //    console.log(window.scrollY);
+    if (path < window.screen.height && false) {
+      console.log("here dsdddddddddddddddddddddddddddddddddddddddddddddddddd");
+
+      setTimeout(() => {
+        setPg(pg + 1);
+      }, 500);
+    }
+    //   console.log(document.body.getBoundingClientRect().top);
+  });
 
   useEffect(() => {
     if (added_post) {
@@ -99,6 +137,7 @@ const Home = () => {
       <>
         <ToolBar />
         <ListTweet posts={posts} user={"-"} protocol="profile_tweets" />
+        <div className="last_div" id="last_div"></div>
       </>
     );
   }

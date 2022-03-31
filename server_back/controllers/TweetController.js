@@ -264,14 +264,21 @@ class TweetController {
     try {
       const user_id = req.user.id;
 
+      console.log(req.query.page);
+
+      let skip = (req.query.page - 1) * 10;
+
+      const page = req.query.page;
       const current_user = await User.findById(user_id);
       const following = current_user.following.concat([user_id]);
       const following_tweets = await Tweet.find({
         author: { $in: following },
       })
         .populate("author")
-        .sort([["createdAt", -1]]);
-
+        .skip(skip)
+        .limit(10);
+      {
+        /*
       let following_retweets = await ReTweet.find({
         author: { $in: following },
       }).populate({
@@ -282,12 +289,12 @@ class TweetController {
           model: "User",
         },
       });
-
       const result = following_tweets
         .concat(convertReToTw(following_retweets))
-        .sort(byField("createdAt"));
-
-      res.status(200).json(result);
+        ;
+*/
+      }
+      res.status(200).json(following_tweets.sort(byField("createdAt")));
     } catch (err) {
       console.log(err);
       res.status(400).json({ message: err.message });
