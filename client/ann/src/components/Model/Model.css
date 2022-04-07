@@ -100,3 +100,46 @@
   display: grid;
   justify-content: center;
 }
+
+.input_for_post{
+  background: #000;
+  height: 2rem;
+}
+
+.post_img {
+  max-width: 10rem;
+  max-height: 10rem;
+  height: auto;
+  width: auto;
+ object-fit: cover;
+
+}
+
+.img_container {
+  display: flex;
+  align-items: center;
+  background:rgba(0, 0, 0, 0.3);
+  justify-content: center;
+  padding: 1rem;
+}
+
+.cross {
+  background: rgb(198, 16, 16);
+  padding: 0.25rem 0.35rem;
+  border-radius: 100%;
+  position: relative;
+  right: 0.65rem;
+  top: -0.65rem;
+  transition: all linear 0.3s;
+}
+
+.cross:hover {
+  background-color: rgb(0, 0, 0);
+  color: #fff;
+  transform: scale(1.1);
+}
+
+.post_img_cont {
+  display: flex;
+  align-items: flex-start
+}

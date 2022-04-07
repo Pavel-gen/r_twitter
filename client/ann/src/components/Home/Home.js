@@ -137,7 +137,7 @@ const Home = () => {
       <>
         <ToolBar />
         <ListTweet posts={posts} user={"-"} protocol="profile_tweets" />
-        <div className="last_div" id="last_div"></div>
+        {/* <div className="last_div" id="last_div"></div> */}
       </>
     );
   }

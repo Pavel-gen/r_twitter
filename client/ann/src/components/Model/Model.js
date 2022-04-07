@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import { add_post, update_post } from "../../fearutures/postSlice";
 import { useSelector } from "react-redux";
 import "../Tweet/Tweet.css";
+import axios from "axios";
 
 const Model = ({ id, operation, start_content }) => {
   let inner_content = useSelector((state) => state.first_blood.chosen_content);
@@ -13,12 +14,16 @@ const Model = ({ id, operation, start_content }) => {
 
   if (inner_content) inner_content = inner_content.payload;
   if (start_author) start_author = start_author.payload;
+
   const [content, setContent] = useState("");
   const [commContent, setCommContent] = useState("");
   const dispatch = useDispatch();
-  const [author, setAuthor] = useState(null);
 
+  const [author, setAuthor] = useState(null);
   const [localAuthor, setLocalAuthor] = useState(null);
+  const [postImg, setPostImg] = useState([]);
+  const [imgSrc, setImgSrc] = useState([]);
+
   const user_id = localStorage.getItem("user_id");
 
   useEffect(async () => {
@@ -30,6 +35,11 @@ const Model = ({ id, operation, start_content }) => {
     }
   }, []);
 
+  useEffect(async () => {
+    console.log(postImg);
+    console.log("life sucks");
+  }, [postImg]);
+
   useEffect(() => {
     setContent(inner_content);
   }, [inner_content]);
@@ -38,24 +48,66 @@ const Model = ({ id, operation, start_content }) => {
     setAuthor(start_author);
   }, [start_author]);
 
+  useEffect(() => {
+    const promises = postImg.map((file) => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.addEventListener("load", (ev) => {
+          resolve(ev.target.result);
+        });
+        reader.addEventListener("error", reject);
+        reader.readAsDataURL(file);
+      });
+    });
+    Promise.all(promises).then((images) => {
+      setImgSrc(images);
+    });
+  }, [postImg]);
+
+  const crossHandler = (item) => {
+    try {
+      let needed_index = imgSrc.indexOf(item);
+      setPostImg(postImg.filter((el) => el !== postImg[needed_index]));
+    } catch (err) {
+      console.log({ message: err.message });
+    }
+  };
+
   const createTweet = async (dispatch) => {
     try {
       console.log(content);
+      const form = new FormData();
       const url = "http://localhost:4000/api/posts";
-      const data = {
-        content: content,
-      };
+      form.append("content", content);
+      form.append("media", postImg);
+
       const token = localStorage.getItem("token");
+
       const post = await fetch(url, {
         method: "POST",
         mode: "cors",
+        cache: "no-cache",
         headers: {
-          "Content-Type": "application/json",
           Authorization: "Bearer " + token,
+          Accept: "application/json",
         },
-        body: JSON.stringify(data),
+        body: form,
       });
+      {
+        /*
+
+  const post = await axios.post(url, form, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: "Bearer" + token,
+        },
+      });
+ */
+      }
+
+      console.log(post);
       const result = await post.json();
+
       result.author = localAuthor;
       console.log(localAuthor);
       dispatch(add_post(result));
@@ -190,6 +242,20 @@ const Model = ({ id, operation, start_content }) => {
                 >
                   cancel
                 </button>
+                <div>
+                  <label onClick={() => console.log(postImg)}>
+                    +
+                    <input
+                      type="file"
+                      onChange={(e) => {
+                        postImg.length < 4
+                          ? setPostImg([e.target.files[0]].concat(postImg))
+                          : alert("4 is max amount");
+                      }}
+                    />
+                  </label>
+                </div>
+
                 <button
                   className="model_post"
                   onClick={() => createTweet(dispatch)}
@@ -274,6 +340,22 @@ const Model = ({ id, operation, start_content }) => {
               </div>
             </>
           )}
+          <div className="img_container">
+            {imgSrc.map((item) => {
+              return (
+                <div className="post_img_cont">
+                  <img className="post_img" src={item} />
+                  <i
+                    class="fa fa-times cross"
+                    aria-hidden="true"
+                    onClick={() => {
+                      crossHandler(item);
+                    }}
+                  ></i>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </>
