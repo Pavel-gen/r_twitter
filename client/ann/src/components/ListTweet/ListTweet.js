@@ -137,6 +137,7 @@ const ListTweet = ({ posts, user, protocol }) => {
 
         <Model id="editmodel" operation="EDIT" />
         <Model id="commentmodel" operation="COMMENT" />
+        <Model id="imgModel" />
       </div>
     </>
   );

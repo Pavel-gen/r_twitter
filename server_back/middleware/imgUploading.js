@@ -9,6 +9,10 @@ const storage = multer.diskStorage({
   },
 });
 
+export const postImges = multer({ storage: storage }).fields([
+  { name: "media", maxCount: 4 },
+]);
+
 const uploadingImg = multer({ storage: storage }).fields([
   { name: "avatar", maxCount: 1 },
   { name: "backimg", maxCount: 1 },

@@ -14,6 +14,7 @@ const Tweet = new Schema(
     threadId: { type: Schema.Types.ObjectId, ref: "Tweet", default: null },
     retweetedBy: [{ type: Schema.Types.ObjectId, ref: "User", default: [] }],
     isRetweet: { type: Boolean, default: false },
+    media: [{ type: String }],
   },
 
   {

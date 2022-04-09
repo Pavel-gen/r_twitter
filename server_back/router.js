@@ -6,6 +6,7 @@ import authMiddleware from "./middleware/authMiddleware.js";
 import uploadingImg from "./middleware/imgUploading.js";
 import ReTweetController from "./controllers/ReTweetController.js";
 import Tweet from "./models/Tweet.js";
+import { postImges } from "./middleware/imgUploading.js";
 
 const router = Router();
 
@@ -13,6 +14,7 @@ router.post(
   "/posts",
   check("content", "Content не может быть пустым").notEmpty(),
   authMiddleware,
+  postImges,
   TweetController.create
 );
 router.get("/posts", authMiddleware, TweetController.getAll);
@@ -34,6 +36,8 @@ router.put("/posts/:tweet_id/likes", authMiddleware, TweetController.like);
 router.post(
   "/posts/:target_tweet_id",
   authMiddleware,
+  postImges,
+
   TweetController.addComment
 );
 router.post(

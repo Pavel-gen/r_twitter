@@ -8,6 +8,8 @@ import postSlice, {
   changed_id,
   choose_post,
   add_post,
+  add_media,
+  add_startIndex,
 } from "../../fearutures/postSlice";
 import { useSelector, useDispatch } from "react-redux";
 import moment from "moment";
@@ -132,7 +134,9 @@ const Tweet = ({
   target_tweet,
   updatedAt,
   retweet_auth,
+  media,
 }) => {
+  console.log(media);
   const user_id = localStorage.getItem("user_id");
   const startLikeCondition = likedBy.includes(user_id);
 
@@ -357,6 +361,7 @@ const Tweet = ({
                           commentTo,
                           protocol,
                           comments,
+                          media,
                         })
                       );
                       navigate(`/tweets/${_id}`);
@@ -364,6 +369,29 @@ const Tweet = ({
                   >
                     {content}
                   </div>
+                  {media.length > 0 && (
+                    <div className="alt_img_container">
+                      {media.length > 0 &&
+                        media.map((src) => {
+                          return (
+                            <img
+                              className={
+                                media.length > 1
+                                  ? "new_post_img size2"
+                                  : "new_post_img size1"
+                              }
+                              onClick={() => {
+                                let index = media.indexOf(src);
+                                dispatch(add_media(media));
+                                dispatch(add_startIndex(index));
+                                toggleModel("imgModel");
+                              }}
+                              src={`http://localhost:4000/${src}`}
+                            />
+                          );
+                        })}
+                    </div>
+                  )}
                   <div className="foot_t foot_t_ch">
                     <span>
                       <i
@@ -455,7 +483,7 @@ const Tweet = ({
                     <div className="retweet_bar">
                       <div className="retweet_to">retweeted</div>
 
-                      {/* <div
+                      <div
                         className="reply_to_author"
                         onClick={() => {
                           navigate(`/profile/${retweet_auth}`);
@@ -463,7 +491,6 @@ const Tweet = ({
                       >
                         {retweet_auth}
                       </div>
-                      */}
                     </div>
                   )}
                   <div className="header_t">
@@ -593,6 +620,7 @@ const Tweet = ({
                           commentTo,
                           protocol,
                           comments,
+                          media,
                         })
                       );
                       navigate(`/tweets/${_id}`);
@@ -600,6 +628,30 @@ const Tweet = ({
                   >
                     {content}
                   </div>
+                  {media.length > 0 && (
+                    <div className="alt_img_container">
+                      {media.length > 0 &&
+                        media.map((src) => {
+                          return (
+                            <img
+                              onClick={() => {
+                                let index = media.indexOf(src);
+                                dispatch(add_media(media));
+                                dispatch(add_startIndex(index));
+                                toggleModel("imgModel");
+                              }}
+                              className={
+                                media.length > 1
+                                  ? "new_post_img size2"
+                                  : "new_post_img size1"
+                              }
+                              src={`http://localhost:4000/${src}`}
+                            />
+                          );
+                        })}
+                    </div>
+                  )}
+
                   <div className="foot_t">
                     <span>
                       <i

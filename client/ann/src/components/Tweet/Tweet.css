@@ -273,3 +273,25 @@
 .retweet_clicked {
   color: rgb(29, 201, 29);
 }
+
+.new_post_img {
+  border: 0.15rem solid #000;
+  border-radius: 0.25rem;
+  object-fit: cover;
+  height: auto
+}
+
+.size1 {
+  max-width: 100%;
+}
+
+.size2 {
+  width: 50%;
+  height: 10rem;
+}
+
+.alt_img_container {
+  display: flex;
+    flex-wrap: wrap;
+  margin-top: 1rem;
+}

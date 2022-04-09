@@ -19,6 +19,7 @@ const convertReToTw = (arr) => {
     thing.retweetedBy = item.tweet.retweetedBy;
     thing.isRetweet = true;
     thing.retweet_auth = item.author;
+    thing.media = item.tweet.media;
     return thing;
   });
   return result;
@@ -31,9 +32,21 @@ const byField = (field) => {
 class TweetController {
   async create(req, res) {
     try {
+      console.log(req);
+      let media;
+
+      console.log(req.files);
+
+      if (req.files && req.files["media"]) {
+        media = req.files["media"].map((item) => {
+          return item.path;
+        });
+      }
+
       const tweet = await Tweet.create({
         author: req.user.id,
         content: req.body.content,
+        media,
       });
       return res.status(200).json(tweet);
     } catch (e) {
@@ -111,7 +124,7 @@ class TweetController {
 
   async deleteAll(req, res) {
     try {
-      //const delete_tweets = await Tweet.deleteMany();
+      const delete_tweets = await Tweet.deleteMany();
       // const delete_users = await User.deleteMany();
       const delete_retweets = await ReTweet.deleteMany();
       res.status(228).json({ message: "all was deleted" });
@@ -212,6 +225,16 @@ class TweetController {
     try {
       const { target_tweet_id } = req.params;
 
+      let media;
+
+      console.log(req.files);
+
+      if (req.files && req.files["media"]) {
+        media = req.files["media"].map((item) => {
+          return item.path;
+        });
+      }
+
       const target_tweet = await Tweet.findById(target_tweet_id);
       console.log(target_tweet);
       const comments = await Tweet.find({
@@ -234,6 +257,7 @@ class TweetController {
         content: req.body.content,
         commentTo: target_tweet_id,
         threadId,
+        media,
       });
       target_tweet.comments.push(new_tweet_comment._id);
 
@@ -270,13 +294,13 @@ class TweetController {
 
       const page = req.query.page;
       const current_user = await User.findById(user_id);
-      const following = current_user.following.concat([user_id]);
+      const following = [user_id].concat(current_user.following);
       const following_tweets = await Tweet.find({
         author: { $in: following },
       })
-        .populate("author")
-        .skip(skip)
-        .limit(10);
+        .sort({ createdAt: 1 })
+        .populate("author");
+
       {
         /*
       let following_retweets = await ReTweet.find({
@@ -294,7 +318,7 @@ class TweetController {
         ;
 */
       }
-      res.status(200).json(following_tweets.sort(byField("createdAt")));
+      res.status(200).json(following_tweets);
     } catch (err) {
       console.log(err);
       res.status(400).json({ message: err.message });

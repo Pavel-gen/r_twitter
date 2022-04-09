@@ -10,6 +10,8 @@ export const postSlice = createSlice({
     chosen_content: null,
     chosen_id: null,
     this_post: null,
+    media: [],
+    startMediaIndex: 0,
   },
   reducers: {
     delete_post: (state, id) => {
@@ -33,6 +35,12 @@ export const postSlice = createSlice({
     choose_post: (state, post) => {
       state.this_post = post;
     },
+    add_media: (state, media) => {
+      state.media = media;
+    },
+    add_startIndex: (state, index) => {
+      state.startMediaIndex = index;
+    },
   },
 });
 
@@ -44,5 +52,7 @@ export const {
   changed_content,
   changed_id,
   choose_post,
+  add_media,
+  add_startIndex,
 } = postSlice.actions;
 export default postSlice.reducer;
