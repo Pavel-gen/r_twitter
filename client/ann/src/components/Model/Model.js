@@ -30,8 +30,6 @@ const Model = ({ id, operation, start_content }) => {
 
   useEffect(() => {
     if (id === "imgModel") {
-      console.log(added_media);
-      console.log(initial_index.payload);
       setCurrentIndex(initial_index.payload);
     }
   }, [added_media, initial_index]);
@@ -44,11 +42,6 @@ const Model = ({ id, operation, start_content }) => {
       setLocalAuthor(result);
     }
   }, []);
-
-  useEffect(async () => {
-    console.log(postImg);
-    console.log("life sucks");
-  }, [postImg]);
 
   useEffect(() => {
     setContent(inner_content);

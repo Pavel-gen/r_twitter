@@ -9,6 +9,7 @@ import TweetToolBar from "./TweetToolBar/TweetToolBar";
 import Loading from "../Loading/Loading";
 import { useParams } from "react-router-dom";
 import { MiddlewareArray } from "@reduxjs/toolkit";
+import axios from "axios";
 
 const getPosts = async (id) => {
   const token = localStorage.getItem("token");
@@ -50,12 +51,16 @@ export const getUser = async () => {
 };
 */
 
+const getUserId = () => {
+  const new_url = window.location.href;
+  console.log(new_url);
+  const index = new_url.indexOf("profile/") + 8;
+  return new_url.slice(index, index + 24);
+};
+
 const getUserLikes = async () => {
   try {
-    const new_url = window.location.href;
-    console.log(new_url);
-    const index = new_url.indexOf("profile/") + 8;
-    const new_id = new_url.slice(index, index + 24);
+    const new_id = getUserId();
 
     const user_id = localStorage.getItem("user_id");
     const url = `http://localhost:4000/api/users/${new_id}/likes`;
@@ -67,10 +72,52 @@ const getUserLikes = async () => {
   }
 };
 
+const getUserReplies = async () => {
+  try {
+    let user_id = getUserId();
+    const url = `http://localhost:4000/api/users/${user_id}/replies`;
+
+    let req = await axios.get(url);
+
+    console.log("-------------------------");
+    console.log(req.data);
+    console.log("-----------------------");
+
+    let f_replies = [];
+    req.data.map((item) => {
+      item.commentTo.threadId = null;
+      f_replies.push(item.commentTo);
+      item.threadId = item.commentTo._id;
+      item.commentTo = item.commentTo._id;
+
+      f_replies.push(item);
+    });
+
+    return f_replies.reverse();
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const getUserMedia = async () => {
+  try {
+    const user_id = getUserId();
+    const url = `http://localhost:4000/api/users/${user_id}/media`;
+
+    const req = await axios.get(url);
+
+    return req.data;
+  } catch (err) {
+    console.log({ message: err.message });
+  }
+};
+
 const User = ({ type }) => {
   const [posts, setPosts] = useState([]);
   const [user, setUser] = useState(null);
-  const [likes, setLikes] = useState(null);
+  const [likes, setLikes] = useState([]);
+  const [replies, setReplies] = useState([]);
+  const [media, setMedia] = useState([]);
   const dispatch = useDispatch();
   const added_post = useSelector((state) => state.first_blood.added_post);
   const updated_post = useSelector((state) => state.first_blood.updated_post);
@@ -87,6 +134,17 @@ const User = ({ type }) => {
 
       console.log(likes);
     }
+
+    if (type == "replies") {
+      const get_replies = await getUserReplies();
+
+      setReplies(get_replies);
+    }
+    if (type == "media") {
+      const get_media = await getUserMedia();
+
+      setMedia(get_media);
+    }
   }, [document.location.href]);
 
   const { id } = useParams();
@@ -97,9 +155,7 @@ const User = ({ type }) => {
     const user = await fetch(url);
     const current_user = await user.json();
 
-    console.log(user_id);
     let data = await getPosts(id);
-    console.log(data);
 
     if (data.length == 0) {
       setUser(current_user);
@@ -233,11 +289,29 @@ const User = ({ type }) => {
         <div className="list_tweets">
           <TweetToolBar user={user} type={type} />
         </div>
-        <ListTweet
-          protocol={type == "likes" ? "likes" : "profile_tweets"}
-          posts={type == "likes" ? likes : posts}
-          user={type == "likes" ? "-" : user}
-        />
+        <ListTweet protocol={"profile_tweets"} posts={posts} user={user} />
+      </div>
+    );
+  } else if (type == "replies" && user && replies) {
+    return (
+      <div>
+        <ToolBar />
+        <Profile user={user} />
+        <div className="list_tweets">
+          <TweetToolBar user={user} type={type} />
+        </div>
+        <ListTweet protocol={"replies"} posts={replies} user={user} />
+      </div>
+    );
+  } else if (type == "media" && user && media) {
+    return (
+      <div>
+        <ToolBar />
+        <Profile user={user} />
+        <div className="list_tweets">
+          <TweetToolBar user={user} type={type} />
+        </div>
+        <ListTweet protocol={"replies"} posts={media} user={user} />
       </div>
     );
   } else if (user) {

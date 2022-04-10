@@ -58,12 +58,26 @@ const ListTweet = ({ posts, user, protocol }) => {
     );
   }
 
+  if (protocol == "replies") {
+    allowed_posts = posts.filter(
+      (item) => item.threadId == null || item.isRetweet
+    );
+
+    posts = posts.map((item) => {
+      if (typeof item.author === typeof "l") {
+        item.author = user;
+      }
+      return item;
+      console.log(allowed_posts);
+    });
+  }
+
   if (protocol == "choosen_post") {
     allowed_posts = posts;
   }
-  allowed_posts.sort((a, b) => {
-    return new Date(b.createdAt) - new Date(a.createdAt);
-  });
+  //allowed_posts.sort((a, b) => {
+  //  return new Date(b.createdAt) - new Date(a.createdAt);
+  //});
   console.log(allowed_posts);
 
   // console.log(check_arr);

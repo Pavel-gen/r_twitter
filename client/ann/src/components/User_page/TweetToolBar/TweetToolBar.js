@@ -9,6 +9,7 @@ const TweetToolBar = ({ user, type }) => {
       btn.classList.add("hide");
     });
   }, [document.location.href]);
+
   useEffect(() => {
     const start_el = document.getElementById(type);
     console.log(start_el);
@@ -42,13 +43,13 @@ const TweetToolBar = ({ user, type }) => {
         </button>
         <button
           className="f_btn"
-          id="replies"
           onClick={(e) => {
             e.preventDefault();
             colorBlind(e);
+            navigate(`/profile/${user._id}/replies`);
           }}
         >
-          replies<div className="button_line hide"></div>
+          replies<div id="replies" className="button_line hide"></div>
         </button>
 
         <button
@@ -56,6 +57,7 @@ const TweetToolBar = ({ user, type }) => {
           onClick={(e) => {
             e.preventDefault();
             colorBlind(e);
+            navigate(`/profile/${user._id}/media`);
           }}
         >
           media<div id="media" className="button_line hide"></div>

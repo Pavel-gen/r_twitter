@@ -73,6 +73,8 @@ router.get("/users/:id", UserController.getUser);
 router.get("/users/:id/followers", UserController.getFollowers);
 router.put("/users/:id", authMiddleware, UserController.follow);
 router.get("/users/:id/likes", UserController.getUserLikes);
+router.get("/users/:id/replies", UserController.getReplies);
+router.get("/users/:id/media", UserController.getUserMedia);
 
 router.delete("/delete_all", TweetController.deleteAll);
 

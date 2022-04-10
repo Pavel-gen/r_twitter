@@ -28,6 +28,14 @@ export const AuthRoutes = [
     element: <User type="likes" />,
   },
   {
+    path: "profile/:id/replies",
+    element: <User type="replies" />,
+  },
+  {
+    path: "profile/:id/media",
+    element: <User type="media" />,
+  },
+  {
     path: "profile/:id/home",
     element: <Home />,
   },

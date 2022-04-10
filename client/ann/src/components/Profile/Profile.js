@@ -99,7 +99,7 @@ const Profile = ({ user }) => {
                         Follow(user._id);
                       }}
                     >
-                      {condition ? "folowing" : "follow"}
+                      {condition ? "following" : "follow"}
                     </button>
                   </>
                 ) : (

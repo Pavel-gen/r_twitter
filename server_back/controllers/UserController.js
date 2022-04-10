@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import { validationResult } from "express-validator";
 import dotenv from "dotenv";
 import multer from "multer";
+import Tweet from "../models/Tweet.js";
 
 ///import no_avatar from '../static/default-avatar.png'
 dotenv.config();
@@ -224,6 +225,49 @@ class UserController {
       res.status(200).json([actual_user, target_user]);
     } catch (e) {
       res.status(200).json(e.message);
+    }
+  }
+
+  async getReplies(req, res) {
+    try {
+      let user_id = req.params.id;
+
+      const replies = await Tweet.find({
+        author: user_id,
+        commentTo: { $ne: null },
+        threadId: null,
+      }).populate([
+        {
+          path: "commentTo",
+          model: "Tweet",
+          populate: {
+            path: "author",
+            model: "User",
+          },
+        },
+      ]);
+
+      res.status(200).json(replies);
+    } catch (err) {
+      console.log({ message: err.message });
+      res.status(400).json({ message: err.message });
+    }
+  }
+
+  async getUserMedia(req, res) {
+    try {
+      let user_id = req.params.id;
+      const media = await Tweet.find({
+        author: user_id,
+        media: {
+          $ne: [],
+        },
+      });
+
+      res.status(200).json(media);
+    } catch (err) {
+      console.log({ message: err.message });
+      res.status(400).json({ message: err.message });
     }
   }
 }

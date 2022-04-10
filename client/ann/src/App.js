@@ -9,11 +9,19 @@ function App() {
     <BrowserRouter>
       <Routes>
         {notAuthRoutes.map((route) => {
-          return <Route path={route.path} element={route.element} />;
+          return (
+            <Route key={route.path} path={route.path} element={route.element} />
+          );
         })}
         {Auth &&
           AuthRoutes.map((route) => {
-            return <Route path={route.path} element={route.element} />;
+            return (
+              <Route
+                key={route.path}
+                path={route.path}
+                element={route.element}
+              />
+            );
           })}
       </Routes>
     </BrowserRouter>

@@ -136,7 +136,6 @@ const Tweet = ({
   retweet_auth,
   media,
 }) => {
-  console.log(media);
   const user_id = localStorage.getItem("user_id");
   const startLikeCondition = likedBy.includes(user_id);
 
