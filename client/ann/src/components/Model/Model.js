@@ -128,6 +128,8 @@ const Model = ({ id, operation, start_content }) => {
       console.log(localAuthor);
       dispatch(add_post(result));
       setContent("");
+      setPostImg([]);
+
       toggleModel("postmodel");
     } catch (err) {
       console.log({ message: err.message });
@@ -217,6 +219,7 @@ const Model = ({ id, operation, start_content }) => {
         onClick={(e) => {
           e.stopPropagation();
           toggleModel(id);
+          setPostImg([]);
         }}
       >
         {id !== "imgModel" ? (
@@ -285,6 +288,7 @@ const Model = ({ id, operation, start_content }) => {
                     onClick={() => {
                       toggleModel(id);
                       setContent("");
+                      setPostImg([]);
                     }}
                   >
                     cancel
@@ -370,6 +374,7 @@ const Model = ({ id, operation, start_content }) => {
                       onClick={() => {
                         toggleModel(id);
                         setCommContent("");
+                        setPostImg([]);
                       }}
                     >
                       cancel
@@ -392,6 +397,7 @@ const Model = ({ id, operation, start_content }) => {
                       onClick={() => {
                         addComment();
                         setCommContent("");
+                        setPostImg([]);
                       }}
                     >
                       reply
