@@ -22,6 +22,17 @@ const ToolBar = () => {
           <li
             className="tool_li"
             onClick={() => {
+              navigate(`/`);
+            }}
+          >
+            <span>
+              <i class="fa fa-globe li_span" aria-hidden="true"></i>
+            </span>
+            <p className="l_content">Glob line</p>
+          </li>
+          <li
+            className="tool_li"
+            onClick={() => {
               navigate(`/profile/${id}/home`);
             }}
           >

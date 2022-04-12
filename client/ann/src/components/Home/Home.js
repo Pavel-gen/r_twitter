@@ -8,6 +8,7 @@ import Model from "../Model/Model";
 import Loading from "../Loading/Loading";
 import "./Home.css";
 import { current } from "@reduxjs/toolkit";
+import axios from "axios";
 
 export const getPosts = async (pg) => {
   const token = localStorage.getItem("token");
@@ -33,6 +34,17 @@ export const getPosts = async (pg) => {
   return result;
 };
 
+const getGlobalLine = async () => {
+  try {
+    let url = `http://localhost:4000/api/gLine`;
+
+    const tweets = await axios.get(url);
+    return tweets.data;
+  } catch (err) {
+    console.log(err.message);
+  }
+};
+
 const getUser = async () => {
   try {
     const user_id = localStorage.getItem("user_id");
@@ -45,7 +57,7 @@ const getUser = async () => {
   }
 };
 
-const Home = () => {
+const Home = ({ type }) => {
   const [posts, setPosts] = useState([]);
   const [pg, setPg] = useState(1);
   const [user, setUser] = useState(null);
@@ -57,9 +69,16 @@ const Home = () => {
   const updated_post = useSelector((state) => state.first_blood.updated_post);
 
   useEffect(async () => {
-    const lol = await getPosts(pg);
-    setPosts(lol);
-    setLoading(false);
+    if (!type) {
+      const lol = await getPosts(pg);
+      setPosts(lol);
+      setLoading(false);
+    } else {
+      let result = await getGlobalLine();
+      console.log(result);
+      setPosts(result);
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -67,9 +86,15 @@ const Home = () => {
   }, [posts]);
 
   useEffect(async () => {
-    const next_posts = await getPosts(pg);
-    if (next_posts.length > 0) {
-      setPosts(posts.concat(next_posts));
+    try {
+      if (!type) {
+        const next_posts = await getPosts(pg);
+        if (next_posts.length > 0) {
+          setPosts(posts.concat(next_posts));
+        }
+      }
+    } catch (err) {
+      console.log({ message: err.message });
     }
   }, [pg]);
 
@@ -136,7 +161,7 @@ const Home = () => {
     return (
       <>
         <ToolBar />
-        <ListTweet posts={posts} user={"-"} protocol="profile_tweets" />
+        <ListTweet posts={posts} user={"-"} protocol="base" />
         {/* <div className="last_div" id="last_div"></div> */}
       </>
     );

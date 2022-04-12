@@ -16,6 +16,15 @@ export const notAuthRoutes = [
     path: "/login",
     element: <Login />,
   },
+  {
+    path: "/",
+    element: (
+      <>
+        <ToolBar />
+        <Home type="global_line" />
+      </>
+    ),
+  },
 ];
 
 export const AuthRoutes = [

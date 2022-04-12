@@ -90,29 +90,6 @@ class TweetController {
       });
       const mod_retweet = convertReToTw(retweets);
 
-      {
-        /*
-      const mod_retweet = retweets.map((item) => {
-        let thing = new Object();
-
-        thing.content = item.tweet.content;
-        thing.author = item.tweet.author;
-        thing.createdAt = item.createdAt;
-        thing._id = item._id;
-        thing.target_tweet = item.tweet._id;
-        thing.likes = item.tweet.likes;
-        thing.likedBy = item.tweet.likedBy;
-        thing.comments = item.tweet.comments;
-        thing.commentTo = item.tweet.commentTo;
-        thing.threadId = item.tweet.threadId;
-        thing.retweetedBy = item.tweet.retweetedBy;
-        thing.isRetweet = true;
-        thing.retweet_auth = item.author;
-        return thing;
-      });
-*/
-      }
-
       const result = posts.concat(mod_retweet).sort(byField("createdAt"));
 
       res.status(200).json(result);
@@ -300,24 +277,6 @@ class TweetController {
       })
         .sort({ createdAt: 1 })
         .populate("author");
-
-      {
-        /*
-      let following_retweets = await ReTweet.find({
-        author: { $in: following },
-      }).populate({
-        path: "tweet",
-        model: "Tweet",
-        populate: {
-          path: "author",
-          model: "User",
-        },
-      });
-      const result = following_tweets
-        .concat(convertReToTw(following_retweets))
-        ;
-*/
-      }
       res.status(200).json(following_tweets);
     } catch (err) {
       console.log(err);
@@ -325,32 +284,44 @@ class TweetController {
     }
   }
 
-  /*
-  async addRetweet(req, res) {
+  async getGlobalLine(req, res) {
     try {
-      const tweet_id = req.params.id;
-      const user = await User.findById(req.user.id);
-      const tweet = await Tweet.findById(tweet_id);
+      const tweets = await Tweet.find().populate("author");
+      let retweets = await ReTweet.find().populate({
+        path: "tweet",
+        model: "Tweet",
+        populate: {
+          path: "author",
+          model: "User",
+        },
+      });
+      const mod_retweet = convertReToTw(retweets);
 
-      if (!tweet.retweetedBy.includes(req.user.id)) {
-        tweet.retweetedBy.push(user._id);
-        user.retweets.push(tweet_id);
-      } else {
-        const tweet_index = user.retweets.indexOf(tweet_id);
-        const user_index = tweet.retweetedBy.indexOf(user.id);
-        user.retweets.splice(tweet_index, 1);
-        tweet.retweetedBy.splice(user_index, 1);
-      }
-      tweet.save();
-      user.save();
+      const final_result = tweets.concat(mod_retweet);
 
-      res.status(200).json({ user, tweet });
+      let curTime = new Date();
+      final_result.map((item) => {
+        let actuality = curTime - item.createdAt;
+        let rate =
+          ((1 +
+            item.retweetedBy.length +
+            item.likedBy.length +
+            item.comments.length) *
+            100) /
+          actuality;
+        console.log(rate);
+        item.rate = rate;
+      });
+      final_result.sort((a, b) => {
+        return b.rate - a.rate;
+      });
+      res.status(200).json(final_result);
     } catch (err) {
-      console.log(err);
+      console.log(err.status);
+      console.log({ message: err.message });
       res.status(400).json({ message: err.message });
     }
   }
-*/
 }
 
 export default new TweetController();

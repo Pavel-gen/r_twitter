@@ -20,6 +20,8 @@ router.post(
 router.get("/posts", authMiddleware, TweetController.getAll);
 router.get("/posts/:id", TweetController.getOne);
 
+router.get("/gLine", TweetController.getGlobalLine);
+
 router.get(
   "/tweets/spec/:user_id",
   authMiddleware,

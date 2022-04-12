@@ -6,8 +6,7 @@ import cors from "cors";
 
 dotenv.config();
 
-const uri =
-  "mongodb+srv://test01:rootroot@cluster0.plrsk.mongodb.net/n_twitter?retryWrites=true&w=majority";
+const uri = process.env.DB_URL;
 const app = express();
 
 const PORT = process.env.PORT || 5000;
@@ -30,6 +29,4 @@ const start = async () => {
 };
 
 start();
-// signIn signUp jwt user
-// post
-// CRUD
+
