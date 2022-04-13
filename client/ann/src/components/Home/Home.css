@@ -1,4 +1,10 @@
 .last_div {
-  background: #000;
+  background: transparent;
   height: 1rem;
+}
+.hide_last_el {
+  display: none
+}
+html {
+  scroll-behavior: smooth;
 }

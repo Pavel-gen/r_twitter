@@ -22,7 +22,7 @@ const ToolBar = () => {
           <li
             className="tool_li"
             onClick={() => {
-              navigate(`/`);
+              navigate(`/`, { replace: true });
             }}
           >
             <span>
@@ -33,7 +33,8 @@ const ToolBar = () => {
           <li
             className="tool_li"
             onClick={() => {
-              navigate(`/profile/${id}/home`);
+              window.location.href = `http://localhost:3000/profile/${id}/home`;
+              //navigate(`/profile/${id}/home`, { replace: true });
             }}
           >
             <span>

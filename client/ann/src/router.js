@@ -46,7 +46,7 @@ export const AuthRoutes = [
   },
   {
     path: "profile/:id/home",
-    element: <Home />,
+    element: <Home type="home" />,
   },
   {
     path: "profile/:id/followers",

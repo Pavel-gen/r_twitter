@@ -7,7 +7,7 @@ import ToolBar from "../ToolBar/ToolBar";
 import Model from "../Model/Model";
 import Loading from "../Loading/Loading";
 import "./Home.css";
-import { current } from "@reduxjs/toolkit";
+import { current, isRejectedWithValue } from "@reduxjs/toolkit";
 import axios from "axios";
 
 export const getPosts = async (pg) => {
@@ -75,6 +75,7 @@ const getPagLine = async (skipTw, skipRe) => {
 };
 
 const Home = ({ type }) => {
+  console.log(type);
   const [posts, setPosts] = useState([]);
   const [addedPosts, setAddedPosts] = useState([]);
   const [user, setUser] = useState(null);
@@ -82,13 +83,14 @@ const Home = ({ type }) => {
   const [lastId, setLastId] = useState(null);
   const [skipTw, setSkipTw] = useState(0);
   const [skipRe, setSkipRe] = useState(0);
+  const [exLoading, setExLoading] = useState(false);
 
   const dispatch = useDispatch();
   const added_post = useSelector((state) => state.first_blood.added_post);
   const updated_post = useSelector((state) => state.first_blood.updated_post);
 
   useEffect(async () => {
-    if (!type) {
+    if (type == "home") {
       const lol = await getPagLine(skipTw, skipRe);
       console.log(lol);
       setSkipTw(lol.skip_tw);
@@ -103,24 +105,41 @@ const Home = ({ type }) => {
     }
   }, []);
 
-  useEffect(() => {
-    console.log(posts);
-  }, [posts]);
+  useEffect(async () => {
+    if (exLoading && type == "home") {
+      moreTweetsHandler();
+    }
+
+    console.log("triggered");
+  }, [exLoading]);
 
   const moreTweetsHandler = async () => {
     try {
+      console.log("working");
       let morePosts = await getPagLine(skipTw, skipRe);
       setSkipTw(morePosts.skip_tw);
       setSkipRe(morePosts.skip_re);
       console.log(morePosts);
+
+      console.log(morePosts.result.length);
+      let item = document.querySelector(".marker");
+
+      if (morePosts.result.length !== 0) {
+        item.classList.remove("hide_last_el");
+      } else {
+        item.classList.remove("marker");
+        item.classList.remove("hide_last_el");
+      }
+
       setPosts(posts.concat(morePosts.result));
+      setExLoading(false);
     } catch (err) {
       console.log({ message: err.message });
     }
   };
 
   window.addEventListener("scroll", () => {
-    let item = document.getElementById("last_div");
+    let item = document.querySelector(".marker");
     let path = 0;
     if (item) {
       path = item.getBoundingClientRect().bottom;
@@ -128,8 +147,9 @@ const Home = ({ type }) => {
     // console.log(window.innerHeight);
 
     if (Math.round(path) == window.innerHeight) {
-      /// moreTweetsHandler();
+      setExLoading(!exLoading);
       console.log("lldslsldsl");
+      item.classList.add("hide_last_el");
 
       //   console.log(document.body.getBoundingClientRect().top);
     }
@@ -181,16 +201,16 @@ const Home = ({ type }) => {
       <>
         <ToolBar />
         <ListTweet posts={posts} user={"-"} protocol="profile_tweets" />
+        {exLoading && <Loading />}
 
-        <button
+        {/* <button
           onClick={() => {
             moreTweetsHandler();
           }}
         >
           click to see more man
-        </button>
-
-        <div className="last_div" id="last_div"></div>
+        </button>*/}
+        <div className="marker last_div" id="last_div"></div>
       </>
     );
   }
