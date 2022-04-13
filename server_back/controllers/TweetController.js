@@ -322,6 +322,86 @@ class TweetController {
       res.status(400).json({ message: err.message });
     }
   }
+
+  /*
+ будет 20 сущностей на экране или немного больше если учитывать треды
+ пикаем 20 ретивтов и 20 твитов без комменнтариев
+ потом конвертим их в твиты и сортирум по времент создания
+ смотрим на каком послежнем ретивите или твите набирается 20 сущностей
+ далее делаем запрос на треды и грущим только последние 4 элемента
+ модифицируем их таким образом чтобы на фронте появлялась конпка
+ профит.
+ */
+
+  async testGetReq(req, res) {
+    try {
+      let { limit, skip_tw, skip_re } = req.query;
+      const user_id = req.user.id;
+      limit = parseInt(limit);
+      skip_tw = parseInt(skip_tw);
+      skip_re = parseInt(skip_re);
+
+      const user = await User.findById(user_id);
+      console.log(user);
+
+      let following = [user_id].concat(user.following);
+
+      const tweets = await Tweet.find({
+        commentTo: null,
+        author: { $in: following },
+      })
+        .limit(limit)
+        .sort({ createdAt: -1 })
+        .skip(skip_tw)
+        .populate("author");
+
+      const retweets = await ReTweet.find({
+        retweet_auth: { $in: following },
+      })
+        .limit(limit)
+        .sort({ createdAt: -1 })
+        .populate("tweet")
+        .populate({
+          path: "tweet",
+          model: "Tweet",
+          populate: {
+            path: "author",
+            model: "User",
+          },
+        })
+        .skip(skip_re);
+      let modified_retweets = convertReToTw(retweets);
+
+      let result = tweets.concat(modified_retweets).sort((a, b) => {
+        return b.createdAt - a.createdAt;
+      });
+
+      result = result.slice(0, limit);
+      let newSkipTw = result.filter((item) => item.isRetweet == false).length;
+      let newSkipRe = result.length - newSkipTw;
+      const tweets_for_arr = tweets.slice(0, newSkipRe);
+      const threadIds = tweets_for_arr.map((post) => {
+        return post._id;
+      });
+
+      let replies = await Tweet.find({
+        threadId: { $in: threadIds },
+      }).populate("author");
+
+      result = result.concat(replies);
+
+      console.log(newSkipRe, newSkipTw);
+
+      res.status(200).json({
+        skip_tw: skip_tw + newSkipTw,
+        skip_re: skip_re + newSkipRe,
+        result,
+      });
+    } catch (err) {
+      console.log({ message: err.message });
+      res.json({ message: err.message });
+    }
+  }
 }
 
 export default new TweetController();

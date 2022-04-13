@@ -10,6 +10,8 @@ import { postImges } from "./middleware/imgUploading.js";
 
 const router = Router();
 
+router.get("/test/posts", authMiddleware, TweetController.testGetReq);
+
 router.post(
   "/posts",
   check("content", "Content не может быть пустым").notEmpty(),

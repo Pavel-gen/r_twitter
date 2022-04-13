@@ -57,12 +57,31 @@ const getUser = async () => {
   }
 };
 
+const getPagLine = async (skipTw, skipRe) => {
+  try {
+    console.log(skipTw);
+    const limit = 5;
+    const token = localStorage.getItem("token");
+    const url = `http://localhost:4000/api/test/posts?limit=${limit}&skip_tw=${skipTw}&skip_re=${skipRe}`;
+
+    const postLine = await axios.get(url, {
+      headers: { Authorization: "Bearer " + token },
+    });
+
+    return postLine.data;
+  } catch (err) {
+    console.log({ message: err.message });
+  }
+};
+
 const Home = ({ type }) => {
   const [posts, setPosts] = useState([]);
-  const [pg, setPg] = useState(1);
+  const [addedPosts, setAddedPosts] = useState([]);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [lastId, setLastId] = useState(null);
+  const [skipTw, setSkipTw] = useState(0);
+  const [skipRe, setSkipRe] = useState(0);
 
   const dispatch = useDispatch();
   const added_post = useSelector((state) => state.first_blood.added_post);
@@ -70,8 +89,11 @@ const Home = ({ type }) => {
 
   useEffect(async () => {
     if (!type) {
-      const lol = await getPosts(pg);
-      setPosts(lol);
+      const lol = await getPagLine(skipTw, skipRe);
+      console.log(lol);
+      setSkipTw(lol.skip_tw);
+      setSkipRe(lol.skip_re);
+      setPosts(lol.result);
       setLoading(false);
     } else {
       let result = await getGlobalLine();
@@ -85,18 +107,17 @@ const Home = ({ type }) => {
     console.log(posts);
   }, [posts]);
 
-  useEffect(async () => {
+  const moreTweetsHandler = async () => {
     try {
-      if (!type) {
-        const next_posts = await getPosts(pg);
-        if (next_posts.length > 0) {
-          setPosts(posts.concat(next_posts));
-        }
-      }
+      let morePosts = await getPagLine(skipTw, skipRe);
+      setSkipTw(morePosts.skip_tw);
+      setSkipRe(morePosts.skip_re);
+      console.log(morePosts);
+      setPosts(posts.concat(morePosts.result));
     } catch (err) {
       console.log({ message: err.message });
     }
-  }, [pg]);
+  };
 
   window.addEventListener("scroll", () => {
     let item = document.getElementById("last_div");
@@ -104,16 +125,14 @@ const Home = ({ type }) => {
     if (item) {
       path = item.getBoundingClientRect().bottom;
     }
+    // console.log(window.innerHeight);
 
-    //    console.log(window.scrollY);
-    if (path < window.screen.height && false) {
-      console.log("here dsdddddddddddddddddddddddddddddddddddddddddddddddddd");
+    if (Math.round(path) == window.innerHeight) {
+      /// moreTweetsHandler();
+      console.log("lldslsldsl");
 
-      setTimeout(() => {
-        setPg(pg + 1);
-      }, 500);
+      //   console.log(document.body.getBoundingClientRect().top);
     }
-    //   console.log(document.body.getBoundingClientRect().top);
   });
 
   useEffect(() => {
@@ -161,8 +180,17 @@ const Home = ({ type }) => {
     return (
       <>
         <ToolBar />
-        <ListTweet posts={posts} user={"-"} protocol="base" />
-        {/* <div className="last_div" id="last_div"></div> */}
+        <ListTweet posts={posts} user={"-"} protocol="profile_tweets" />
+
+        <button
+          onClick={() => {
+            moreTweetsHandler();
+          }}
+        >
+          click to see more man
+        </button>
+
+        <div className="last_div" id="last_div"></div>
       </>
     );
   }
