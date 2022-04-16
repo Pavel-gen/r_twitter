@@ -7,6 +7,7 @@ import Model from "../Model/Model";
 import EmptyList from "../EmptyList/EmptyList";
 
 const ListTweet = ({ posts, user, protocol }) => {
+  console.log(posts);
   // нужно сохдать структуру которая будет раскладывать твиты по веткам и подгружать сооствествующий css
 
   /*
@@ -36,7 +37,7 @@ const ListTweet = ({ posts, user, protocol }) => {
   как-то это нужно имплеиентировать но как .... 
 
 */
-  let allowed_posts;
+  let allowed_posts = [];
   const user_id = localStorage.getItem("user_id");
   //   let check_arr = posts.filter((post) => post.commentTo !== null);
 
@@ -62,18 +63,37 @@ const ListTweet = ({ posts, user, protocol }) => {
     allowed_posts = posts.filter(
       (item) => item.threadId == null || item.isRetweet
     );
+    let indexes = allowed_posts.map((item) => {
+      return item._id;
+    });
+
+    indexes = [...new Set(indexes)];
+
+    allowed_posts = allowed_posts.filter((item) => {
+      if (indexes.includes(item._id)) {
+        indexes = indexes.filter((id) => id !== item._id);
+        return item;
+      }
+    });
 
     posts = posts.map((item) => {
       if (typeof item.author === typeof "l") {
         item.author = user;
       }
       return item;
-      console.log(allowed_posts);
     });
   }
 
   if (protocol == "choosen_post") {
     allowed_posts = posts;
+  }
+
+  if (protocol == "media") {
+    allowed_posts = posts.map((item) => {
+      item.author = user;
+      item.threadId = null;
+      return item;
+    });
   }
   //allowed_posts.sort((a, b) => {
   //  return new Date(b.createdAt) - new Date(a.createdAt);
@@ -135,7 +155,7 @@ const ListTweet = ({ posts, user, protocol }) => {
 
             return (
               <Tweet
-                key={post._id}
+                key={post._id + protocol}
                 {...post}
                 thread={thread}
                 type={post.threadId == null ? "base" : "comment"}

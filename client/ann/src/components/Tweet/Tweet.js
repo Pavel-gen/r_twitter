@@ -151,8 +151,13 @@ const Tweet = ({
   const deleted_id = useSelector((state) => state.first_blood.id);
 
   let next_post;
-  if (thread) {
-    next_post = thread[0];
+  let alt_next_posts = [];
+  if (protocol !== "replies") {
+    if (thread) {
+      next_post = thread[0];
+    }
+  } else {
+    alt_next_posts = thread;
   }
 
   if (isRetweet) {
@@ -210,7 +215,8 @@ const Tweet = ({
       {origin_length > 2 &&
       thread.length > 1 &&
       protocol !== "thread" &&
-      type == "comment" ? (
+      type == "comment" &&
+      type !== " replies" ? (
         <></>
       ) : (
         <>
@@ -232,7 +238,7 @@ const Tweet = ({
           {subtype == "choosen_post" && (
             <>
               <div
-                id={_id}
+                id={_id + protocol}
                 className={
                   type == "base"
                     ? next_post == undefined
@@ -454,8 +460,8 @@ const Tweet = ({
                 id={_id}
                 className={
                   type == "base" || isRetweet
-                    ? next_post == undefined
-                      ? "container_t"
+                    ? next_post == undefined && alt_next_posts.length == 0
+                      ? "container_t "
                       : "container_t tweet_base"
                     : "container_t tweet_thread"
                 }
@@ -470,7 +476,7 @@ const Tweet = ({
                       });
                     }}
                   />
-                  {next_post && (
+                  {(next_post || alt_next_posts.length > 0) && (
                     <div className="comment_space">
                       <div className="comment_stick"></div>
                     </div>
@@ -708,22 +714,43 @@ const Tweet = ({
           )}
         </>
       )}
-      <>
-        {next_post && !isRetweet && (
-          <>
-            <Tweet
-              type="comment"
-              key={next_post._id}
-              {...next_post}
-              thread={thread.filter((el) => el !== next_post)}
-              origin_length={origin_length}
-              base_id={base_id}
-              protocol={protocol}
-              subtype={null}
-            />
-          </>
-        )}
-      </>
+      {protocol !== "replies" ? (
+        <>
+          {next_post && !isRetweet && (
+            <>
+              <Tweet
+                type="comment"
+                key={next_post._id + protocol}
+                {...next_post}
+                thread={thread.filter((el) => el !== next_post)}
+                origin_length={origin_length}
+                base_id={base_id}
+                protocol={protocol}
+                subtype={null}
+              />
+            </>
+          )}
+        </>
+      ) : (
+        <>
+          {alt_next_posts.map((NP) => {
+            return (
+              <>
+                <Tweet
+                  type="comment"
+                  key={NP._id + protocol}
+                  {...NP}
+                  thread={[]}
+                  origin_length={origin_length}
+                  base_id={base_id}
+                  protocol={protocol}
+                  subtype={null}
+                />
+              </>
+            );
+          })}
+        </>
+      )}
     </>
   );
 };

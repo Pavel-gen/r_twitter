@@ -25,6 +25,37 @@ const convertReToTw = (arr) => {
   return result;
 };
 
+const killBill = async (tweets, retweets, limit) => {
+  try {
+    let modified_retweets = convertReToTw(retweets);
+    let result = tweets.concat(modified_retweets).sort((a, b) => {
+      return b.createdAt - a.createdAt;
+    });
+
+    result = result.slice(0, limit);
+    let newSkipTw = result.filter((item) => !item.isRetweet).length;
+    let newSkipRe = result.length - newSkipTw;
+    const tweets_for_arr = tweets.slice(0, newSkipTw);
+
+    const threadIds = tweets_for_arr.map((post) => {
+      return post._id;
+    });
+    console.log(threadIds);
+    let replies = await Tweet.find({
+      threadId: { $in: threadIds },
+    }).populate("author");
+    result = result.concat(replies);
+    console.log(newSkipRe, newSkipTw);
+    return {
+      result,
+      skip_Re: newSkipRe,
+      skip_Tw: newSkipTw,
+    };
+  } catch (err) {
+    console.log({ message: err.message });
+  }
+};
+
 const byField = (field) => {
   return (a, b) => (a[field] > b[field] ? 1 : -1);
 };
@@ -75,24 +106,45 @@ class TweetController {
   async getUserPosts(req, res) {
     try {
       const { user_id } = req.params;
+      let { skip_Re, skip_Tw, limit } = req.query;
+      limit = parseInt(limit);
+      skip_Re = parseInt(skip_Re);
+      skip_Tw = parseInt(skip_Tw);
+
+      console.log(skip_Re, skip_Tw, limit);
       console.log(user_id);
 
-      let posts = await Tweet.find({ author: user_id }).populate("author");
+      let posts = await Tweet.find({ author: user_id, threadId: null })
+        .populate("author")
+        .sort({ createdAt: -1 })
+        .limit(limit)
+        .skip(skip_Tw);
+
       let retweets = await ReTweet.find({
         author: user_id,
-      }).populate({
-        path: "tweet",
-        model: "Tweet",
-        populate: {
-          path: "author",
-          model: "User",
-        },
+      })
+        .populate({
+          path: "tweet",
+          model: "Tweet",
+          populate: {
+            path: "author",
+            model: "User",
+          },
+        })
+
+        .sort({ createdAt: -1 })
+        .limit(limit)
+        .skip(skip_Re);
+
+      let fobj = await killBill(posts, retweets, limit);
+
+      //  console.log(fobj);
+
+      res.status(200).json({
+        result: fobj.result,
+        skip_Re: skip_Re + fobj.skip_Re,
+        skip_Tw: skip_Tw + fobj.skip_Tw,
       });
-      const mod_retweet = convertReToTw(retweets);
-
-      const result = posts.concat(mod_retweet).sort(byField("createdAt"));
-
-      res.status(200).json(result);
     } catch (err) {
       console.log(err);
       res.status(401).json({ message: err.message });
@@ -186,7 +238,7 @@ class TweetController {
       } else if (condition == false) {
         tweet.likedBy.push(user_id);
         tweet.likes = tweet.likes + 1;
-        user.liked.push(tweet_id);
+        user.liked.unshift(tweet_id);
       }
 
       tweet.save();
@@ -370,32 +422,15 @@ class TweetController {
           },
         })
         .skip(skip_re);
-      let modified_retweets = convertReToTw(retweets);
 
-      let result = tweets.concat(modified_retweets).sort((a, b) => {
-        return b.createdAt - a.createdAt;
-      });
+      let final_obj = await killBill(tweets, retweets, limit);
 
-      result = result.slice(0, limit);
-      let newSkipTw = result.filter((item) => item.isRetweet == false).length;
-      let newSkipRe = result.length - newSkipTw;
-      const tweets_for_arr = tweets.slice(0, newSkipRe);
-      const threadIds = tweets_for_arr.map((post) => {
-        return post._id;
-      });
-
-      let replies = await Tweet.find({
-        threadId: { $in: threadIds },
-      }).populate("author");
-
-      result = result.concat(replies);
-
-      console.log(newSkipRe, newSkipTw);
+      console.log(final_obj);
 
       res.status(200).json({
-        skip_tw: skip_tw + newSkipTw,
-        skip_re: skip_re + newSkipRe,
-        result,
+        skip_tw: skip_tw + final_obj.skip_Tw,
+        skip_re: skip_re + final_obj.skip_Re,
+        result: final_obj.result,
       });
     } catch (err) {
       console.log({ message: err.message });

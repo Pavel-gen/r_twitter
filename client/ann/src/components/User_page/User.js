@@ -11,27 +11,6 @@ import { useParams } from "react-router-dom";
 import { MiddlewareArray } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const getPosts = async (id) => {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    return <p>Пользователь не авторизован</p>;
-  }
-  const old_url = "http://localhost:4000/api/posts";
-  const new_url = `http://localhost:4000/api/tweets/spec/${id}`;
-  const posts = await fetch(new_url, {
-    method: "GET",
-    headers: {
-      Authorization: "Bearer " + String(token),
-    },
-  });
-  let result = await posts.json();
-  console.log(result);
-
-  result.sort((a, b) => {
-    return new Date(b.createdAt) - new Date(a.createdAt);
-  });
-  return result;
-};
 /*
 export const getUser = async () => {
   try {
@@ -58,15 +37,15 @@ const getUserId = () => {
   return new_url.slice(index, index + 24);
 };
 
-const getUserLikes = async () => {
+const getUserLikes = async (skip_likes) => {
   try {
     const new_id = getUserId();
-
+    let limit = 10;
     const user_id = localStorage.getItem("user_id");
-    const url = `http://localhost:4000/api/users/${new_id}/likes`;
-    const user = await fetch(url);
-    let result = await user.json();
-    return result;
+    const url = `http://localhost:4000/api/users/${new_id}/likes?skip_likes=${skip_likes}&limit=${limit}`;
+    const user = await axios.get(url);
+    console.log(user);
+    return user.data;
   } catch (err) {
     console.log(err);
   }
@@ -99,12 +78,35 @@ const getUserReplies = async () => {
   }
 };
 
-const getUserMedia = async () => {
+const getUserMedia = async (skip_media) => {
   try {
+    let limit = 5;
     const user_id = getUserId();
-    const url = `http://localhost:4000/api/users/${user_id}/media`;
+    const url = `http://localhost:4000/api/users/${user_id}/media?limit=${limit}&skip_media=${skip_media}`;
 
     const req = await axios.get(url);
+    console.log(req);
+
+    return req.data;
+  } catch (err) {
+    console.log({ message: err.message });
+  }
+};
+
+const getPosts = async (id, skipRe, skipTw) => {
+  try {
+    let limit = 10;
+    const token = localStorage.getItem("token");
+    if (!token) {
+      return <p>Пользователь не авторизован</p>;
+    }
+    const old_url = "http://localhost:4000/api/posts";
+    const new_url = `http://localhost:4000/api/tweets/spec/${id}?skip_Re=${skipRe}&skip_Tw=${skipTw}&limit=${limit}`;
+
+    const req = await axios.get(new_url, {
+      headers: { Authorization: "Bearer " + token },
+    });
+    console.log(req.data);
 
     return req.data;
   } catch (err) {
@@ -118,21 +120,43 @@ const User = ({ type }) => {
   const [likes, setLikes] = useState([]);
   const [replies, setReplies] = useState([]);
   const [media, setMedia] = useState([]);
+  const [skipLikes, setSkipLikes] = useState(0);
+  const [skipReplies, setSkipReplies] = useState(0);
+  const [skipMedia, setSkipMedia] = useState(0);
+  const [exLoading, setExLoading] = useState(false);
+
+  const [skipTw, setSkipTw] = useState(0);
+  const [skipRe, setSkipRe] = useState(0);
+
   const dispatch = useDispatch();
   const added_post = useSelector((state) => state.first_blood.added_post);
   const updated_post = useSelector((state) => state.first_blood.updated_post);
   const updated_user = useSelector((state) => state.user_moves.updated_user);
 
-  useEffect(async () => {
-    if (type === "likes") {
-      const likes = await getUserLikes();
-      console.log(likes);
-      //   likes.map((like) => (like.commentTo = null));
-      if (likes) {
-        setLikes(likes.reverse());
-      }
+  const recycle = (result) => {
+    let item = document.querySelector(".marker");
 
-      console.log(likes);
+    if (result.length !== 0) {
+      item.classList.remove("hide_last_el");
+    } else {
+      item.classList.remove("marker");
+      item.classList.remove("hide_last_el");
+    }
+
+    setExLoading(false);
+  };
+
+  useEffect(async () => {
+    let item = document.getElementById("last_div");
+    if (item) {
+      item.classList.add("marker");
+    }
+
+    if (type === "likes") {
+      const req = await getUserLikes(skipLikes);
+      console.log(req);
+      setLikes(req.result);
+      setSkipLikes(req.skip_likes);
     }
 
     if (type == "replies") {
@@ -140,38 +164,59 @@ const User = ({ type }) => {
 
       setReplies(get_replies);
     }
-    if (type == "media") {
-      const get_media = await getUserMedia();
-
-      setMedia(get_media);
+    if (type == "media" && media.length == 0) {
+      const req = await getUserMedia(skipMedia);
+      console.log(req);
+      setMedia(req.result);
+      setSkipMedia(req.skip_media);
     }
   }, [document.location.href]);
+
+  useEffect(async () => {
+    if (exLoading) {
+      if (type == "tweets") {
+        let req = await getPosts(id, skipRe, skipTw);
+        console.log(req);
+        setSkipRe(req.skip_Re);
+        setSkipTw(req.skip_Tw);
+        setPosts(posts.concat(req.result));
+        recycle(req.result);
+      }
+      if (type == "media") {
+        const req = await getUserMedia(skipMedia);
+
+        setMedia(media.concat(req.result));
+        setSkipMedia(req.skip_media);
+        recycle(req.result);
+      }
+      if (type == "likes") {
+        const req = await getUserLikes(skipLikes);
+        setLikes(likes.concat(req.result));
+        setSkipLikes(req.skip_likes);
+        recycle(req.result);
+      }
+    }
+  }, [exLoading]);
 
   const { id } = useParams();
   const user_id = localStorage.getItem("user_id");
 
   useEffect(async () => {
     const url = `http://localhost:4000/api/users/${id}`;
-    const user = await fetch(url);
-    const current_user = await user.json();
+    const user = await axios.get(url);
+    const current_user = user.data;
 
-    let data = await getPosts(id);
-
-    if (data.length == 0) {
+    let data = await getPosts(id, skipRe, skipTw);
+    setSkipRe(data.skip_Re);
+    setSkipTw(data.skip_Tw);
+    if (data.result.length == 0) {
       setUser(current_user);
       setPosts([]);
     }
 
-    if (data && data.length > 0) {
-      // data = data.filter((post) => post.author._id == id);
-      //data.map((post) => {
-      //  console.log(post.author.username, " : ", post.content);
-      //});
+    if (data.result && data.result.length > 0) {
       setUser(current_user);
-      const tweets = data.sort((a, b) => {
-        return new Date(b.createdAt) - new Date(a.createdAt);
-      });
-      setPosts(tweets);
+      setPosts(data.result);
     }
     window.scrollTo(0, 0);
   }, [id]);
@@ -270,6 +315,22 @@ const User = ({ type }) => {
     }
   }, [id_check]);
 
+  window.addEventListener("scroll", () => {
+    let item = document.querySelector(".marker");
+    let path = 0;
+    if (item) {
+      path = item.getBoundingClientRect().bottom;
+    }
+    // console.log(window.innerHeight);
+    if (Math.round(path / 10) == Math.round(window.innerHeight / 10)) {
+      setExLoading(!exLoading);
+      console.log("lllllllllllllllllllllllllllllllllllll");
+      item.classList.add("hide_last_el");
+
+      //   console.log(document.body.getBoundingClientRect().top);
+    }
+  });
+
   if (type == "likes" && user && likes) {
     return (
       <div>
@@ -279,6 +340,8 @@ const User = ({ type }) => {
           <TweetToolBar user={user} type={type} />
         </div>
         <ListTweet posts={likes} user={"-"} protocol="likes" />
+        {exLoading && <Loading />}
+        <div className="marker last_div" id="last_div"></div>
       </div>
     );
   } else if (type == "tweets" && user && posts) {
@@ -290,6 +353,8 @@ const User = ({ type }) => {
           <TweetToolBar user={user} type={type} />
         </div>
         <ListTweet protocol={"profile_tweets"} posts={posts} user={user} />
+        {exLoading && <Loading />}
+        <div className="marker last_div" id="last_div"></div>
       </div>
     );
   } else if (type == "replies" && user && replies) {
@@ -301,6 +366,8 @@ const User = ({ type }) => {
           <TweetToolBar user={user} type={type} />
         </div>
         <ListTweet protocol={"replies"} posts={replies} user={user} />
+        {exLoading && <Loading />}
+        <div className="marker last_div" id="last_div"></div>
       </div>
     );
   } else if (type == "media" && user && media) {
@@ -311,7 +378,9 @@ const User = ({ type }) => {
         <div className="list_tweets">
           <TweetToolBar user={user} type={type} />
         </div>
-        <ListTweet protocol={"replies"} posts={media} user={user} />
+        <ListTweet protocol={"media"} posts={media} user={user} />
+        {exLoading && <Loading />}
+        <div className="marker last_div" id="last_div"></div>
       </div>
     );
   } else if (user) {

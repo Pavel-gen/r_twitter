@@ -60,7 +60,7 @@ const getUser = async () => {
 const getPagLine = async (skipTw, skipRe) => {
   try {
     console.log(skipTw);
-    const limit = 5;
+    const limit = 10;
     const token = localStorage.getItem("token");
     const url = `http://localhost:4000/api/test/posts?limit=${limit}&skip_tw=${skipTw}&skip_re=${skipRe}`;
 
@@ -90,6 +90,10 @@ const Home = ({ type }) => {
   const updated_post = useSelector((state) => state.first_blood.updated_post);
 
   useEffect(async () => {
+    let item = document.getElementById("last_div");
+    if (item) {
+      item.classList.add("marker");
+    }
     if (type == "home") {
       const lol = await getPagLine(skipTw, skipRe);
       console.log(lol);
@@ -145,8 +149,7 @@ const Home = ({ type }) => {
       path = item.getBoundingClientRect().bottom;
     }
     // console.log(window.innerHeight);
-
-    if (Math.round(path) == window.innerHeight) {
+    if (Math.round(path / 10) == Math.round(window.innerHeight / 10)) {
       setExLoading(!exLoading);
       console.log("lldslsldsl");
       item.classList.add("hide_last_el");
@@ -202,7 +205,7 @@ const Home = ({ type }) => {
         <ToolBar />
         <ListTweet posts={posts} user={"-"} protocol="profile_tweets" />
         {exLoading && <Loading />}
-
+        <div className="marker last_div" id="last_div"></div>
         {/* <button
           onClick={() => {
             moreTweetsHandler();
@@ -210,7 +213,6 @@ const Home = ({ type }) => {
         >
           click to see more man
         </button>*/}
-        <div className="marker last_div" id="last_div"></div>
       </>
     );
   }

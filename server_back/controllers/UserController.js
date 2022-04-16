@@ -131,8 +131,17 @@ class UserController {
   async getUserLikes(req, res) {
     try {
       const { id } = req.params;
+      let { limit, skip_likes } = req.query;
+
+      limit = parseInt(limit);
+      skip_likes = parseInt(skip_likes);
+
       const user = await User.findById(id).populate([
         {
+          options: {
+            limit: limit,
+            skip: skip_likes,
+          },
           path: "liked",
           model: "Tweet",
           populate: {
@@ -141,7 +150,10 @@ class UserController {
           },
         },
       ]);
-      res.status(200).json(user.liked);
+
+      res
+        .status(200)
+        .json({ result: user.liked, skip_likes: skip_likes + limit });
     } catch (err) {
       console.log(err);
     }
@@ -257,14 +269,20 @@ class UserController {
   async getUserMedia(req, res) {
     try {
       let user_id = req.params.id;
+      let { limit, skip_media } = req.query;
+      limit = parseInt(limit);
+      skip_media = parseInt(skip_media);
       const media = await Tweet.find({
         author: user_id,
         media: {
           $ne: [],
         },
-      });
+      })
+        .sort({ createdAt: -1 })
+        .limit(limit)
+        .skip(skip_media);
 
-      res.status(200).json(media);
+      res.status(200).json({ result: media, skip_media: skip_media + limit });
     } catch (err) {
       console.log({ message: err.message });
       res.status(400).json({ message: err.message });

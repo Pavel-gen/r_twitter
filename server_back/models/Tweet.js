@@ -16,7 +16,6 @@ const Tweet = new Schema(
     isRetweet: { type: Boolean, default: false },
     media: [{ type: String }],
   },
-
   {
     timestamps: true,
   }
