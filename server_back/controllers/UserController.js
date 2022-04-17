@@ -239,27 +239,36 @@ class UserController {
       res.status(200).json(e.message);
     }
   }
+/// если в коротко то всё хуйня нужно переделывать 
 
   async getReplies(req, res) {
     try {
       let user_id = req.params.id;
+      let { limit, skip_re } = req.query;
+
+      limit = parseInt(limit);
+      skip_re = parseInt(skip_re);
 
       const replies = await Tweet.find({
         author: user_id,
         commentTo: { $ne: null },
         threadId: null,
-      }).populate([
-        {
-          path: "commentTo",
-          model: "Tweet",
-          populate: {
-            path: "author",
-            model: "User",
+      })
+        .populate([
+          {
+            path: "commentTo",
+            model: "Tweet",
+            populate: {
+              path: "author",
+              model: "User",
+            },
           },
-        },
-      ]);
+        ])
+        .limit(limit)
+        .skip(skip_re)
+        .sort({ createdAt: -1 });
 
-      res.status(200).json(replies);
+      res.status(200).json({ result: replies, skip_re: skip_re + limit });
     } catch (err) {
       console.log({ message: err.message });
       res.status(400).json({ message: err.message });

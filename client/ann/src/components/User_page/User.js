@@ -51,10 +51,11 @@ const getUserLikes = async (skip_likes) => {
   }
 };
 
-const getUserReplies = async () => {
+const getUserReplies = async (skip_re) => {
   try {
     let user_id = getUserId();
-    const url = `http://localhost:4000/api/users/${user_id}/replies`;
+    let limit = 5;
+    const url = `http://localhost:4000/api/users/${user_id}/replies?skip_re=${skip_re}&limit=${limit}`;
 
     let req = await axios.get(url);
 
@@ -63,7 +64,8 @@ const getUserReplies = async () => {
     console.log("-----------------------");
 
     let f_replies = [];
-    req.data.map((item) => {
+    let unique_indexes = [];
+    req.data.result.map((item) => {
       item.commentTo.threadId = null;
       f_replies.push(item.commentTo);
       item.threadId = item.commentTo._id;
@@ -72,7 +74,7 @@ const getUserReplies = async () => {
       f_replies.push(item);
     });
 
-    return f_replies.reverse();
+    return [f_replies, req.data.skip_re];
   } catch (err) {
     console.log(err);
   }
@@ -106,6 +108,7 @@ const getPosts = async (id, skipRe, skipTw) => {
     const req = await axios.get(new_url, {
       headers: { Authorization: "Bearer " + token },
     });
+
     console.log(req.data);
 
     return req.data;
@@ -152,17 +155,18 @@ const User = ({ type }) => {
       item.classList.add("marker");
     }
 
-    if (type === "likes") {
+    if (type === "likes" && likes.length == 0) {
       const req = await getUserLikes(skipLikes);
       console.log(req);
       setLikes(req.result);
       setSkipLikes(req.skip_likes);
     }
 
-    if (type == "replies") {
-      const get_replies = await getUserReplies();
+    if (type == "replies" && replies.length == 0) {
+      const get_replies = await getUserReplies(skipReplies);
 
-      setReplies(get_replies);
+      setReplies(get_replies[0]);
+      setSkipReplies(get_replies[1]);
     }
     if (type == "media" && media.length == 0) {
       const req = await getUserMedia(skipMedia);
@@ -194,6 +198,13 @@ const User = ({ type }) => {
         setLikes(likes.concat(req.result));
         setSkipLikes(req.skip_likes);
         recycle(req.result);
+      }
+
+      if (type == "replies") {
+        const req = await getUserReplies(skipReplies);
+        setReplies(replies.concat(req[0]));
+        setSkipReplies(req[1]);
+        recycle(req[0]);
       }
     }
   }, [exLoading]);
